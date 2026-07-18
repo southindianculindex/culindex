@@ -15,20 +15,17 @@
   <style>
     /* Premium Editorial Theme Variables */
     :root {
-      --bg: #F7F5F0; /* Softer, richer parchment */
+      --bg: #F7F5F0; 
       --surface: #FFFFFF;
-      --text: #1A1F22; /* Deeper, richer black/slate */
+      --text: #1A1F22; 
       --muted: #646E73;
       --border: rgba(26, 31, 34, 0.12);
-      --spice: #A33B24; /* Richer terracotta */
+      --spice: #A33B24; 
       --spice-hover: #822C19;
-      --leaf: #2A4732; /* Deeper forest green */
+      --leaf: #2A4732; 
       
-      /* Subtle, high-end shadows */
       --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.03);
       --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.06);
-      
-      /* Sharper radii for an editorial look */
       --radius: 4px;
       
       --font-heading: "Lora", serif;
@@ -37,7 +34,12 @@
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
+    
+    html { 
+      scroll-behavior: smooth; 
+      /* Fixes the bug where anchor links hide behind the sticky header */
+      scroll-padding-top: 5rem; 
+    }
     
     body {
       font-family: var(--font-body);
@@ -48,7 +50,7 @@
       text-rendering: optimizeLegibility;
     }
 
-    a { color: inherit; text-decoration: none; transition: all 0.3s ease; }
+    a { color: inherit; text-decoration: none; transition: color 0.3s ease, background 0.3s ease; }
     img, svg { display: block; max-width: 100%; }
 
     .container {
@@ -71,6 +73,7 @@
       align-items: center;
       justify-content: space-between;
       padding: 1.25rem 0;
+      position: relative;
     }
 
     .brand {
@@ -82,9 +85,31 @@
 
     .brand span { color: var(--spice); }
 
-    .nav-links { display: flex; gap: 2rem; align-items: center; }
-    .nav-links a { font-size: 0.9rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text); }
+    .nav-links { 
+      display: flex; 
+      gap: 2rem; 
+      align-items: center; 
+    }
+    
+    .nav-links a { 
+      font-size: 0.9rem; 
+      font-weight: 500; 
+      text-transform: uppercase; 
+      letter-spacing: 0.05em; 
+      color: var(--text); 
+    }
+    
     .nav-links a:hover { color: var(--spice); }
+
+    /* Mobile Menu Button */
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text);
+      padding: 0.25rem;
+    }
 
     /* Hero Section */
     .hero {
@@ -93,9 +118,7 @@
       background: linear-gradient(to bottom, var(--surface) 0%, transparent 100%);
     }
 
-    .hero-content {
-      max-width: 800px;
-    }
+    .hero-content { max-width: 800px; }
 
     .eyebrow {
       font-family: var(--font-body);
@@ -110,7 +133,7 @@
 
     .hero h1 {
       font-family: var(--font-heading);
-      font-size: clamp(3rem, 6vw, 4.5rem);
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
       line-height: 1.1;
       font-weight: 500;
       margin-bottom: 1.5rem;
@@ -118,7 +141,7 @@
     }
 
     .hero .subtitle {
-      font-size: 1.25rem;
+      font-size: clamp(1.1rem, 3vw, 1.25rem);
       color: var(--muted);
       font-weight: 300;
       margin-bottom: 2.5rem;
@@ -138,35 +161,25 @@
       font-weight: 500;
       border: 1px solid transparent;
       cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s ease;
     }
 
-    .btn-primary {
-      background: var(--spice);
-      color: #fff;
-    }
-
-    .btn-primary:hover {
-      background: var(--spice-hover);
-    }
+    .btn-primary { background: var(--spice); color: #fff; }
+    .btn-primary:hover { background: var(--spice-hover); transform: translateY(-2px); }
 
     /* Sections Shared */
     section { padding: 6rem 0; }
-    
     .section-header { margin-bottom: 4rem; max-width: 700px; }
     .section-header h2 {
       font-family: var(--font-heading);
-      font-size: 2.5rem;
+      font-size: clamp(2rem, 4vw, 2.5rem);
       font-weight: 500;
       color: var(--leaf);
       margin-bottom: 1rem;
     }
 
     /* Grids & Cards */
-    .grid-2 {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 2rem;
-    }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem; }
 
     .card {
       background: var(--surface);
@@ -174,10 +187,13 @@
       padding: 3rem;
       border-radius: var(--radius);
       box-shadow: var(--shadow-sm);
-      transition: box-shadow 0.3s ease;
+      transition: box-shadow 0.3s ease, transform 0.3s ease;
     }
 
-    .card:hover { box-shadow: var(--shadow-lg); }
+    .card:hover { 
+      box-shadow: var(--shadow-lg); 
+      transform: translateY(-4px); 
+    }
     
     .card h3 {
       font-family: var(--font-heading);
@@ -187,7 +203,7 @@
       padding-bottom: 0.75rem;
     }
 
-    /* Team Section (New) */
+    /* Team Section */
     .team-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -231,7 +247,7 @@
       font-weight: 500;
     }
 
-    .contact-link:hover { text-decoration: underline; }
+    .contact-link:hover { text-decoration: underline; color: var(--spice-hover); }
 
     /* Map Section */
     .map-container {
@@ -273,10 +289,7 @@
       margin-bottom: 1rem;
     }
     
-    .footer-brand p {
-      color: rgba(255,255,255,0.7);
-      max-width: 400px;
-    }
+    .footer-brand p { color: rgba(255,255,255,0.7); max-width: 400px; }
 
     .footer-contact h4 {
       font-family: var(--font-body);
@@ -303,10 +316,28 @@
       font-size: 0.85rem;
     }
 
-    /* Responsive */
+    /* Mobile Responsiveness */
     @media (max-width: 768px) {
       .grid-2, .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
-      .nav-links { display: none; }
+      
+      .mobile-menu-btn { display: block; }
+      
+      /* Mobile Dropdown Menu Styling */
+      .nav-links { 
+        display: none; 
+        flex-direction: column; 
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: rgba(247, 245, 240, 0.98);
+        padding: 1.5rem 0;
+        border-bottom: 1px solid var(--border);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+      }
+      
+      .nav-links.active { display: flex; }
+
       .hero { padding: 4rem 0; }
       .card { padding: 2rem; }
       .footer-bottom { flex-direction: column; gap: 1rem; text-align: center; }
@@ -318,6 +349,15 @@
   <header class="site-header">
     <div class="container nav">
       <a href="#" class="brand">CUL<span>INDEX</span></a>
+      
+      <button class="mobile-menu-btn" aria-label="Toggle navigation" aria-expanded="false">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+
       <nav class="nav-links">
         <a href="#about">Project</a>
         <a href="#regions">Regions</a>
@@ -390,7 +430,7 @@
           <p>Our upcoming location-based module will allow researchers and enthusiasts to explore recipes, ingredients, and culinary histories by exact geographic coordinates.</p>
         </div>
         <div class="map-container">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon>
             <line x1="9" y1="3" x2="9" y2="18"></line>
             <line x1="15" y1="6" x2="15" y2="21"></line>
@@ -414,7 +454,7 @@
             <h3>Dr. Gigy J. Alex</h3>
             <div class="institution">Indian Institute of Space Science and Technology, Thiruvananthapuram</div>
             <a href="mailto:gigyjalex@gmail.com" class="contact-link">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
               gigyjalex@gmail.com
             </a>
           </div>
@@ -424,7 +464,7 @@
             <h3>Dr. Anu Kuriakose</h3>
             <div class="institution">National Institute of Technology, Trichy</div>
             <a href="mailto:anuk@nitt.edu" class="contact-link">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
               anuk@nitt.edu
             </a>
           </div>
@@ -450,9 +490,31 @@
       </div>
       <div class="footer-bottom">
         <p>&copy; 2026 CULINDEX. All rights reserved.</p>
+        <p>Hosted via GitHub Pages</p>
       </div>
     </div>
   </footer>
+
+  <!-- Script for Mobile Menu -->
+  <script>
+    const menuBtn = document.querySelector('.mobile-menu-btn');
+    const navLinks = document.querySelector('.nav-links');
+    
+    // Toggle menu open/close
+    menuBtn.addEventListener('click', () => {
+      navLinks.classList.toggle('active');
+      const isExpanded = menuBtn.getAttribute('aria-expanded') === 'true';
+      menuBtn.setAttribute('aria-expanded', !isExpanded);
+    });
+
+    // Close menu when a link is clicked
+    document.querySelectorAll('.nav-links a').forEach(link => {
+      link.addEventListener('click', () => {
+        navLinks.classList.remove('active');
+        menuBtn.setAttribute('aria-expanded', 'false');
+      });
+    });
+  </script>
 
 </body>
 </html>
