@@ -1,31 +1,458 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CULINDEX | The Culinary Heritage Index</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Lora:wght@400;600;700&display=swap" rel="stylesheet">
-<style>
-body{margin:0;font-family:Inter,sans-serif;background:#f7f4ee;color:#243036}
-header{background:linear-gradient(135deg,#f9f6f0,#fff);padding:80px 8%}
-nav{position:sticky;top:0;background:rgba(255,255,255,.85);backdrop-filter:blur(12px);display:flex;justify-content:space-between;padding:18px 8%;box-shadow:0 2px 15px rgba(0,0,0,.05)}
-nav a{text-decoration:none;color:#243036;margin-left:24px}
-.logo{font:700 30px Lora,serif}.logo span{color:#c05640}
-.hero{display:grid;grid-template-columns:2fr 1fr;gap:40px;align-items:center}
-h1{font:700 64px Lora,serif;margin:.2em 0}
-.btn{display:inline-block;padding:14px 26px;background:#c05640;color:#fff;border-radius:30px;text-decoration:none}
-section{padding:70px 8%}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px}
-.card{background:#fff;padding:24px;border-radius:18px;box-shadow:0 10px 24px rgba(0,0,0,.06)}
-.stats{display:flex;gap:20px;flex-wrap:wrap}.stat{background:#fff;padding:20px;border-radius:16px;flex:1;text-align:center}
-footer{background:#243036;color:#fff;padding:50px 8%}
-small{color:#ccc}
-@media(max-width:800px){.hero{grid-template-columns:1fr}h1{font-size:42px}nav{flex-direction:column}}
-</style></head><body>
-<nav><div class="logo">CUL<span>INDEX</span></div><div><a href="#about">About</a><a href="#regions">Regions</a><a href="#team">Team</a><a href="#contact">Contact</a></div></nav>
-<header><div class="hero"><div><p><b>ONGOING RESEARCH PROJECT</b></p><h1>The Culinary Heritage Index</h1><p>An evolving digital archive documenting the vernacular cuisines, ingredients, foodways and culinary landscapes of Kerala and Tamil Nadu.</p><a class="btn" href="#contact">Collaborate</a></div><div class="card"><h3>Project Status</h3><p><b>Phase 1:</b> Data Collection ✓</p><p><b>Phase 2:</b> Metadata & Standardisation</p><p><b>Phase 3:</b> Interactive GIS Platform</p></div></div></header>
-<section><div class="stats"><div class="stat"><h2>2</h2><p>States</p></div><div class="stat"><h2>100+</h2><p>Recipes (Target)</p></div><div class="stat"><h2>GIS</h2><p>Cultural Mapping</p></div></div></section>
-<section id="about"><h2>About the Project</h2><p>CULINDEX documents domestic recipes, indigenous ingredients, oral histories, agricultural traditions and regional culinary practices to build an open scholarly archive of South Indian food heritage.</p></section>
-<section id="regions"><h2>Research Regions</h2><div class="cards"><div class="card"><h3>Kerala</h3><p>Syrian Christian, Mappila, Tribal, Namboothiri and regional cuisines across the state.</p></div><div class="card"><h3>Tamil Nadu</h3><p>Chettinad, Kongunadu, Madurai, Nanjil Nadu and other vernacular food traditions.</p></div></div></section>
-<section id="team"><h2>Principal Investigators</h2><div class="cards"><div class="card"><h3>Dr. Gigy J. Alex</h3><p><b>Principal Investigator</b></p><p>Indian Institute of Space Science and Technology (IIST)<br>Thiruvananthapuram, India</p><p>Email: gigyjalex@gmail.com</p></div><div class="card"><h3>Dr. Anu Kuriakose</h3><p><b>Principal Investigator</b></p><p>National Institute of Technology Tiruchirappalli (NIT Trichy)</p><p>Email: anuk@nitt.edu</p></div></div></section>
-<section id="contact"><h2>Contact & Collaboration</h2><div class="card"><p>Researchers, chefs, historians and community contributors are welcome to collaborate.</p><ul><li>southindianculindex@gmail.com</li><li>gigyjalex@gmail.com</li><li>anuk@nitt.edu</li></ul></div></section>
-<footer><h3>CULINDEX</h3><p>A Digital Preservation Initiative for the Culinary Heritage of Kerala & Tamil Nadu.</p><small>© 2026 CULINDEX</small></footer>
-</body></html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="CULINDEX is an evolving digital archive and cultural map documenting the vernacular cuisines of Kerala and Tamil Nadu." />
+  <meta name="theme-color" content="#F7F5F0" />
+  <title>CULINDEX | The Culinary Heritage Index</title>
+
+  <!-- Professional Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+
+  <style>
+    /* Premium Editorial Theme Variables */
+    :root {
+      --bg: #F7F5F0; /* Softer, richer parchment */
+      --surface: #FFFFFF;
+      --text: #1A1F22; /* Deeper, richer black/slate */
+      --muted: #646E73;
+      --border: rgba(26, 31, 34, 0.12);
+      --spice: #A33B24; /* Richer terracotta */
+      --spice-hover: #822C19;
+      --leaf: #2A4732; /* Deeper forest green */
+      
+      /* Subtle, high-end shadows */
+      --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.03);
+      --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.06);
+      
+      /* Sharper radii for an editorial look */
+      --radius: 4px;
+      
+      --font-heading: "Lora", serif;
+      --font-body: "Inter", sans-serif;
+      --max-width: 1200px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    
+    body {
+      font-family: var(--font-body);
+      color: var(--text);
+      background-color: var(--bg);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    a { color: inherit; text-decoration: none; transition: all 0.3s ease; }
+    img, svg { display: block; max-width: 100%; }
+
+    .container {
+      width: min(100% - 3rem, var(--max-width));
+      margin-inline: auto;
+    }
+
+    /* Navigation */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(247, 245, 240, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 0;
+    }
+
+    .brand {
+      font-family: var(--font-heading);
+      font-size: 1.5rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+
+    .brand span { color: var(--spice); }
+
+    .nav-links { display: flex; gap: 2rem; align-items: center; }
+    .nav-links a { font-size: 0.9rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text); }
+    .nav-links a:hover { color: var(--spice); }
+
+    /* Hero Section */
+    .hero {
+      padding: 7rem 0 5rem;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(to bottom, var(--surface) 0%, transparent 100%);
+    }
+
+    .hero-content {
+      max-width: 800px;
+    }
+
+    .eyebrow {
+      font-family: var(--font-body);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--leaf);
+      margin-bottom: 1.5rem;
+      display: block;
+    }
+
+    .hero h1 {
+      font-family: var(--font-heading);
+      font-size: clamp(3rem, 6vw, 4.5rem);
+      line-height: 1.1;
+      font-weight: 500;
+      margin-bottom: 1.5rem;
+      color: var(--text);
+    }
+
+    .hero .subtitle {
+      font-size: 1.25rem;
+      color: var(--muted);
+      font-weight: 300;
+      margin-bottom: 2.5rem;
+      max-width: 600px;
+    }
+
+    /* Modern Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem 2rem;
+      border-radius: var(--radius);
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 500;
+      border: 1px solid transparent;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: var(--spice);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--spice-hover);
+    }
+
+    /* Sections Shared */
+    section { padding: 6rem 0; }
+    
+    .section-header { margin-bottom: 4rem; max-width: 700px; }
+    .section-header h2 {
+      font-family: var(--font-heading);
+      font-size: 2.5rem;
+      font-weight: 500;
+      color: var(--leaf);
+      margin-bottom: 1rem;
+    }
+
+    /* Grids & Cards */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 3rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow 0.3s ease;
+    }
+
+    .card:hover { box-shadow: var(--shadow-lg); }
+    
+    .card h3 {
+      font-family: var(--font-heading);
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.75rem;
+    }
+
+    /* Team Section (New) */
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+
+    .team-card {
+      background: transparent;
+      border-left: 2px solid var(--spice);
+      padding: 1rem 0 1rem 1.5rem;
+    }
+
+    .team-card h3 {
+      font-family: var(--font-heading);
+      font-size: 1.4rem;
+      color: var(--text);
+      margin-bottom: 0.25rem;
+    }
+
+    .team-card .role {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin-bottom: 0.75rem;
+    }
+
+    .team-card .institution {
+      font-style: italic;
+      font-family: var(--font-heading);
+      color: var(--leaf);
+      margin-bottom: 1rem;
+    }
+    
+    .contact-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+      color: var(--spice);
+      font-weight: 500;
+    }
+
+    .contact-link:hover { text-decoration: underline; }
+
+    /* Map Section */
+    .map-container {
+      height: 500px;
+      background-color: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+      box-shadow: inset 0 0 40px rgba(0,0,0,0.02);
+    }
+
+    .map-container svg { margin-bottom: 1rem; stroke: var(--muted); }
+
+    /* Footer */
+    footer {
+      background: var(--text);
+      color: #fff;
+      padding: 5rem 0 3rem;
+      margin-top: 4rem;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding-bottom: 4rem;
+      margin-bottom: 2rem;
+    }
+
+    .footer-brand h3 {
+      font-family: var(--font-heading);
+      font-size: 1.75rem;
+      margin-bottom: 1rem;
+    }
+    
+    .footer-brand p {
+      color: rgba(255,255,255,0.7);
+      max-width: 400px;
+    }
+
+    .footer-contact h4 {
+      font-family: var(--font-body);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+      color: rgba(255,255,255,0.5);
+    }
+
+    .footer-contact a {
+      display: block;
+      color: #fff;
+      margin-bottom: 0.75rem;
+      font-size: 1.1rem;
+    }
+
+    .footer-contact a:hover { color: var(--spice); }
+
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      color: rgba(255,255,255,0.5);
+      font-size: 0.85rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .grid-2, .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
+      .nav-links { display: none; }
+      .hero { padding: 4rem 0; }
+      .card { padding: 2rem; }
+      .footer-bottom { flex-direction: column; gap: 1rem; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container nav">
+      <a href="#" class="brand">CUL<span>INDEX</span></a>
+      <nav class="nav-links">
+        <a href="#about">Project</a>
+        <a href="#regions">Regions</a>
+        <a href="#team">Team</a>
+        <a href="#map">Map</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero -->
+    <section class="hero">
+      <div class="container hero-content">
+        <span class="eyebrow">Digital Archive in Progress</span>
+        <h1>The Culinary Heritage Index</h1>
+        <p class="subtitle">An evolving cultural map documenting the hyper-regional vernacular cuisines, agricultural ties, and trade histories of Kerala and Tamil Nadu.</p>
+        <a href="#map" class="btn btn-primary">Explore the Archive</a>
+      </div>
+    </section>
+
+    <!-- About -->
+    <section id="about">
+      <div class="container">
+        <div class="section-header">
+          <h2>Documenting Foodways</h2>
+          <p>Moving beyond restaurant menus to record the foods people actually cook, preserve, adapt, and inherit across generations in Southern India.</p>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <h3>Project Scope</h3>
+            <p style="margin-bottom: 1rem; color: var(--muted);">From the spice-heavy Mappila kitchens of the Malabar coast to the sun-dried, layered flavors of Chettinad, the archive treats food as cultural memory.</p>
+            <p style="color: var(--muted);">We are currently in <strong>Phase 1: Data Collection</strong>, compiling household recipes, seasonal variations, ingredient origins, and oral histories.</p>
+          </div>
+          <div class="card">
+            <h3>The Methodology</h3>
+            <p style="color: var(--muted); margin-bottom: 0.5rem;">• Normalizing hyper-local ingredient terminology.</p>
+            <p style="color: var(--muted); margin-bottom: 0.5rem;">• Tracing historical trade and migration impacts.</p>
+            <p style="color: var(--muted); margin-bottom: 0.5rem;">• Linking local produce systems to geography.</p>
+            <p style="color: var(--muted);">• Preparing datasets for GIS spatial mapping.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Regions -->
+    <section id="regions" style="background-color: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+      <div class="container">
+        <div class="section-header">
+          <h2>Vernacular Landscapes</h2>
+          <p>Categorizing cuisines by micro-regions, indigenous communities, and historical trade routes.</p>
+        </div>
+        <div class="grid-2">
+          <article class="card" style="box-shadow: none; border-top: 3px solid var(--leaf);">
+            <h3>Kerala</h3>
+            <p style="color: var(--muted);">Documenting the nuances of Syrian Christian, Mappila, Tribal, and Namboothiri foodways, tracing the historical impact of the Spice Route from Kasaragod to Thiruvananthapuram.</p>
+          </article>
+          <article class="card" style="box-shadow: none; border-top: 3px solid var(--leaf);">
+            <h3>Tamil Nadu</h3>
+            <p style="color: var(--muted);">Cataloging the distinct regional preparations of Kongunadu, Chettinad, Madurai, and Nanjilnadu, with attention to agricultural ties and indigenous ingredients.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Map Placeholder -->
+    <section id="map">
+      <div class="container">
+        <div class="section-header">
+          <h2>Interactive Cultural Map</h2>
+          <p>Our upcoming location-based module will allow researchers and enthusiasts to explore recipes, ingredients, and culinary histories by exact geographic coordinates.</p>
+        </div>
+        <div class="map-container">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon>
+            <line x1="9" y1="3" x2="9" y2="18"></line>
+            <line x1="15" y1="6" x2="15" y2="21"></line>
+          </svg>
+          <h3 style="font-family: var(--font-heading); margin-bottom: 0.5rem;">Map Module in Development</h3>
+          <p style="color: var(--muted); max-width: 400px;">This space is reserved for the future deployment of our custom GIS layer, featuring interactive region markers and data filters.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Team & Investigators -->
+    <section id="team" style="background-color: var(--surface); border-top: 1px solid var(--border);">
+      <div class="container">
+        <div class="section-header" style="margin-bottom: 3rem;">
+          <h2>Principal Investigators</h2>
+        </div>
+        <div class="team-grid">
+          
+          <div class="team-card">
+            <div class="role">Principal Investigator</div>
+            <h3>Dr. Gigy J. Alex</h3>
+            <div class="institution">Indian Institute of Space Science and Technology, Thiruvananthapuram</div>
+            <a href="mailto:gigyjalex@gmail.com" class="contact-link">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+              gigyjalex@gmail.com
+            </a>
+          </div>
+
+          <div class="team-card">
+            <div class="role">Principal Investigator</div>
+            <h3>Dr. Anu Kuriakose</h3>
+            <div class="institution">National Institute of Technology, Trichy</div>
+            <a href="mailto:anuk@nitt.edu" class="contact-link">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+              anuk@nitt.edu
+            </a>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer id="contact">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <h3>CULINDEX</h3>
+          <p>A digital preservation and mapping project dedicated to the vernacular culinary heritage of Kerala and Tamil Nadu.</p>
+        </div>
+        <div class="footer-contact">
+          <h4>Project Inquiries & Contributions</h4>
+          <a href="mailto:southindianculindex@gmail.com">southindianculindex@gmail.com</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 CULINDEX. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
