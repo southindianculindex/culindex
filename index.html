@@ -9,9 +9,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.css" />
   <style>
     :root {
       --bg: #F7F5F0;
@@ -217,11 +217,32 @@
       border-bottom: 1px solid var(--border);
     }
 
+    /* Map Elements */
+    .map-layout { display: block; }
+    .map-layout-row {
+      display: grid;
+      grid-template-columns: minmax(280px, 320px) 1fr;
+      gap: 1.25rem;
+      align-items: start;
+    }
+
+    .list-panel { display: flex; flex-direction: column; gap: 0.75rem; }
+    .list-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 0.5rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .list-head h3 { font-family: var(--font-heading); font-size: 1rem; color: var(--leaf); }
+    .list-head .count { color: var(--muted); font-size: 0.8rem; }
+
     .map-controls {
       display: flex;
       gap: 0.75rem;
       flex-wrap: wrap;
-      margin-bottom: 0.75rem;
+      margin-bottom: 0.25rem;
       align-items: center;
     }
     .map-controls label {
@@ -244,12 +265,136 @@
       outline: 2px solid var(--spice);
       outline-offset: 1px;
     }
-    .search-input { margin-left: auto; }
+    .search-input { width: 100%; margin-top: 0.5rem; }
 
-    .map-wrap {
-      position: relative;
+    .list-scroll {
+      max-height: 400px;
+      overflow-y: auto;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--surface);
+    }
+    
+    /* District Tree / Accordion */
+    .district-group { border-bottom: 1px solid var(--border); }
+    .district-group:last-child { border-bottom: 0; }
+
+    button.district-state, button.district-role {
       width: 100%;
-      height: 420px;
+      background: none;
+      border: none;
+      text-align: left;
+      font: inherit;
+      outline: none;
+    }
+
+    .district-state {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 0.75rem;
+      background: rgba(42, 71, 50, 0.05);
+      border-left: 3px solid var(--leaf) !important;
+      font-family: var(--font-heading);
+      font-size: 0.95rem;
+      color: var(--leaf);
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+    .district-state:hover { background: rgba(42, 71, 50, 0.1); }
+    .district-state .state-count {
+      font-family: var(--font-body);
+      font-size: 0.7rem;
+      color: var(--muted);
+      background: rgba(0,0,0,0.06);
+      padding: 0.18rem 0.5rem;
+      border-radius: 20px;
+    }
+
+    .district-roles { list-style: none; margin: 0; padding: 0; display: none; }
+    .district-roles.open { display: block; }
+    
+    .district-role {
+      padding: 0.65rem 0.75rem 0.65rem 1.3rem;
+      font-size: 0.82rem;
+      color: var(--text);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background 0.15s ease;
+      border-left: 2px solid transparent !important;
+    }
+    .district-role:hover { background: rgba(163, 59, 36, 0.05); border-left-color: var(--spice) !important; }
+    .district-role .role-name { font-weight: 500; }
+    .district-role .role-count {
+      color: var(--muted);
+      font-size: 0.72rem;
+      background: rgba(0,0,0,0.05);
+      padding: 0.1rem 0.5rem;
+      border-radius: 20px;
+    }
+
+    /* Nested Place List */
+    .place-list {
+      display: none;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .place-list.open { display: block; }
+
+    .place-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 0.75rem 0.5rem 2rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+    .place-row:last-child { border-bottom: 0; }
+    .place-row:hover { background: rgba(42, 71, 50, 0.04); }
+    .place-row.active { background: rgba(42, 71, 50, 0.08); border-left: 2px solid var(--leaf); padding-left: calc(2rem - 2px); }
+    
+    .place-row .place-name { font-weight: 500; }
+    .place-row .place-meta { color: var(--muted); font-size: 0.7rem; margin-top: 1px; text-transform: uppercase; letter-spacing: 0.04em; }
+    .place-row .dish-count { color: var(--muted); font-size: 0.7rem; white-space: nowrap; margin-left: 0.5rem; }
+
+    .dish-chips {
+      display: none;
+      padding: 0.5rem 0.75rem 0.6rem 2rem;
+      background: rgba(0,0,0,0.015);
+      border-bottom: 1px solid var(--border);
+    }
+    .dish-chips.open { display: block; }
+    .dish-chip {
+      display: inline-block;
+      font-size: 0.75rem;
+      margin-right: 0.6rem;
+      color: var(--spice);
+      font-weight: 500;
+    }
+    .dish-chip::before { content: "↳ "; color: var(--border); }
+    
+    .list-empty { padding: 1.5rem; text-align: center; color: var(--muted); font-size: 0.82rem; }
+
+    .district-hint {
+      font-size: 0.82rem;
+      color: var(--muted);
+      padding: 0.6rem 0.75rem;
+      background: rgba(0,0,0,0.02);
+      border-radius: 6px;
+      border: 1px solid var(--border);
+    }
+    .district-hint strong { color: var(--leaf); }
+    .district-hint p { margin-top: 0.25rem; line-height: 1.5; }
+
+    .map-col { position: relative; }
+    .map-wrap {
+      width: 100%;
+      height: 520px;
       border: 1px solid var(--border);
       border-radius: var(--radius);
       overflow: hidden;
@@ -273,456 +418,76 @@
     }
     .map-legend strong { color: var(--text); }
 
+    /* Popups */
     .leaflet-popup-content-wrapper { border-radius: 6px; }
-    .leaflet-popup-content {
-      margin: 10px 12px;
-      font-family: var(--font-body);
-      font-size: 0.85rem;
-    }
-    .popup-name { font-weight: 600; }
-    .popup-record { color: var(--muted); margin-top: 3px; }
-    .popup-record a { color: var(--spice); font-weight: 500; }
-    .popup-record a:hover { text-decoration: underline; }
-    .popup-privacy { color: var(--spice); font-size: 0.78rem; margin-top: 3px; }    .list-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      margin-bottom: 0.5rem;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
-    .list-head h3 {
-      font-family: var(--font-heading);
-      font-size: 1rem;
-      color: var(--leaf);
-    }
-    .list-head .count { color: var(--muted); font-size: 0.8rem; }
-    .list-scroll {
-      max-height: 280px;
-      overflow-y: auto;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      background: var(--surface);
-    }    .list-item:last-child { border-bottom: 0; }
-    .list-item:hover { background: rgba(163, 59, 36, 0.04); }
-    .list-item.active { background: rgba(42, 71, 50, 0.06); }
-    .list-item .name { font-weight: 500; font-size: 0.85rem; }
-    .list-item .name small {
-      color: var(--muted);
-      font-weight: 400;
-      display: block;
-      font-size: 0.72rem;
-      margin-top: 2px;
-    }
-    .list-item .meta { text-align: right; color: var(--muted); font-size: 0.72rem; white-space: nowrap; }
-    .list-item .meta .ptype {
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      font-size: 0.62rem;
-      color: var(--leaf);
-      margin-bottom: 2px;
-    }
-    .list-empty {
-      padding: 1.5rem;
-      text-align: center;
-      color: var(--muted);
-      font-size: 0.82rem;
-    }
-
-    .team-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1rem;
-    }
-    .team-card {
-      background: transparent;
-      border-left: 2px solid var(--spice);
-      padding: 0.6rem 0 0.6rem 1rem;
-    }
-    .team-card h3 {
-      font-family: var(--font-heading);
-      font-size: 1.1rem;
-      margin-bottom: 0.15rem;
-      border: none;
-      padding: 0;
-    }
-    .team-card .role {
-      font-size: 0.72rem;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--muted);
-      margin-bottom: 0.4rem;
-    }
-    .team-card .institution {
-      font-style: italic;
-      font-family: var(--font-heading);
-      color: var(--leaf);
-      font-size: 0.85rem;
-      margin-bottom: 0.5rem;
-    }
-    .contact-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-size: 0.8rem;
-      color: var(--spice);
-      font-weight: 500;
-    }
-    .contact-link:hover { text-decoration: underline; color: var(--spice-hover); }
-
-    footer {
-      background: var(--text);
-      color: #fff;
-      padding: 3.5rem 0 2.5rem;
-      margin-top: 3rem;
-    }
-    .footer-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 3rem;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-      padding-bottom: 2.5rem;
-      margin-bottom: 1.5rem;
-    }
-    .footer-brand h3 {
-      font-family: var(--font-heading);
-      font-size: 1.4rem;
-      margin-bottom: 0.6rem;
-    }
-    .footer-brand p { color: rgba(255,255,255,0.7); font-size: 0.85rem; max-width: 340px; }
-    .footer-contact h4 {
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-bottom: 1rem;
-      color: rgba(255,255,255,0.5);
-    }
-    .footer-contact a {
-      display: block;
-      color: #fff;
-      margin-bottom: 0.5rem;
-      font-size: 0.95rem;
-    }
-    .footer-contact a:hover { color: var(--spice); }
-    .footer-bottom {
-      display: flex;
-      justify-content: space-between;
-      color: rgba(255,255,255,0.55);
-      font-size: 0.75rem;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
-    .footer-bottom a { color: rgba(255,255,255,0.75); }
-    .footer-bottom a:hover { color: #fff; }
-
-    @media (max-width: 768px) {
-      .card-grid { grid-template-columns: 1fr; }
-      .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
-      .mobile-menu-btn { display: block; }
-      .nav-links {
-        display: none;
-        flex-direction: column;
-        position: absolute;
-        top: 100%;
-        left: 0;
-        width: 100%;
-        background: rgba(247, 245, 240, 0.98);
-        padding: 1rem 0;
-        border-bottom: 1px solid var(--border);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.05);
-      }
-      .nav-links.active { display: flex; }
-      .hero { padding: 3rem 0 2.5rem; }
-      .map-wrap { height: 340px; }
-      .list-scroll { max-height: 220px; }
-      .footer-bottom { flex-direction: column; gap: 0.5rem; text-align: center; }
-    }
-
-    @media (max-width: 560px) {
-      .map-controls .search-input { margin-left: 0; width: 100%; }
-    }
-  
-    .sr-only {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border: 0;
-    }
-
-    .map-layout {
-      display: block;
-    }
-    .map-layout-row {
-      display: grid;
-      grid-template-columns: minmax(280px, 320px) 1fr;
-      gap: 1.25rem;
-      align-items: start;
-    }
-
-    .map-panel-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      margin-bottom: 0.6rem;
-      gap: 0.5rem;
-    }
-
-    .list-panel {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
-
-    .district-tree {
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      background: var(--surface);
-      overflow: hidden;
-    }
-
-    .district-group {
-      border-bottom: 1px solid var(--border);
-    }
-    .district-group:last-child {
-      border-bottom: 0;
-    }
-
-    .district-state {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      width: 100%;
-      padding: 0.6rem 0.75rem;
-      background: rgba(42, 71, 50, 0.05);
-      border: 0;
-      border-left: 3px solid var(--leaf);
-      font-family: var(--font-heading);
-      font-size: 0.95rem;
-      color: var(--leaf);
-      cursor: pointer;
-      text-align: left;
-      transition: background 0.15s ease;
-    }
-    .district-state:hover {
-      background: rgba(42, 71, 50, 0.1);
-    }
-    .district-state .state-count {
-      font-family: var(--font-body);
-      font-size: 0.7rem;
-      color: var(--muted);
-      background: rgba(0,0,0,0.06);
-      padding: 0.18rem 0.5rem;
-      border-radius: 20px;
-    }
-
-    .district-roles {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      display: none;
-    }
-    .district-roles.open {
-      display: block;
-    }
-    .district-role {
-      padding: 0.55rem 0.75rem 0.55rem 1.3rem;
-      font-size: 0.82rem;
-      color: var(--text);
-      cursor: pointer;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      transition: background 0.15s ease;
-      border-left: 2px solid transparent;
-    }
-    .district-role:hover {
-      background: rgba(163, 59, 36, 0.05);
-      border-left-color: var(--spice);
-    }
-    .district-role .role-name {
-      font-weight: 500;
-    }
-    .district-role .role-count {
-      color: var(--muted);
-      font-size: 0.72rem;
-      background: rgba(0,0,0,0.05);
-      padding: 0.1rem 0.5rem;
-      border-radius: 20px;
-    }
-
-    .place-list {
-      margin-top: 1px;
-      border-top: 1px solid var(--border);
-      max-height: 220px;
-      overflow-y: auto;
-    }
-    .place-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 0.6rem;
-      padding: 0.5rem 0.75rem 0.5rem 1.3rem;
-      border-bottom: 1px solid var(--border);
-      font-size: 0.82rem;
-      cursor: pointer;
-      transition: background 0.15s ease;
-    }
-    .place-row:last-child {
-      border-bottom: 0;
-    }
-    .place-row:hover {
-      background: rgba(163, 59, 36, 0.05);
-    }
-    .place-row.active {
-      background: rgba(42, 71, 50, 0.07);
-      border-left: 2px solid var(--leaf);
-    }
-    .place-row .place-name {
-      font-weight: 500;
-    }
-    .place-row .place-meta {
-      color: var(--muted);
-      font-size: 0.7rem;
-      margin-top: 1px;
-    }
-    .place-row .dish-count {
-      color: var(--muted);
-      font-size: 0.7rem;
-      white-space: nowrap;
-      margin-left: 0.5rem;
-    }
-
-    .dish-chips {
-      margin-top: 0.4rem;
-      padding: 0.35rem 0.75rem 0.45rem 1.3rem;
-      background: rgba(0,0,0,0.015);
-      border-bottom: 1px solid var(--border);
-      display: none;
-    }
-    .dish-chips.open {
-      display: block;
-    }
-    .dish-chip {
-      display: inline-block;
-      font-size: 0.72rem;
-      margin-right: 0.4rem;
-      color: var(--spice);
-      font-weight: 500;
-    }
-    .dish-chip::before {
-      content: "• ";
-      color: var(--border);
-    }
-
-    .district-hint {
-      font-size: 0.82rem;
-      color: var(--muted);
-      padding: 0.6rem 0.75rem;
-      background: rgba(0,0,0,0.02);
-      border-radius: 6px;
-      border: 1px solid var(--border);
-    }
-    .district-hint strong {
-      color: var(--leaf);
-    }
-    .district-hint p {
-      margin-top: 0.25rem;
-      line-height: 1.5;
-    }
-
-    .map-col .map-wrap {
-      height: 460px;
-    }
-    .map-col {
-      position: relative;
-    }
-
-    .leaflet-popup-content {
-      margin: 6px 8px;
-      font-size: 0.8rem;
-      width: 180px;
-    }
+    .leaflet-popup-content { margin: 10px; font-size: 0.85rem; width: 220px; }
+    
     .popup-dish {
       display: flex;
-      gap: 0.5rem;
+      gap: 0.75rem;
       align-items: center;
-      margin-top: 4px;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border);
     }
     .popup-dish img {
-      width: 52px;
-      height: 52px;
+      width: 60px;
+      height: 60px;
       object-fit: cover;
       border-radius: 4px;
       border: 1px solid var(--border);
       background: var(--surface);
     }
-    .popup-dish .popup-dish-name {
-      display: block;
-      font-weight: 600;
-      color: var(--text);
-      line-height: 1.25;
-    }
-    .popup-dish .popup-dish-brief {
-      display: block;
-      color: var(--muted);
-      font-size: 0.72rem;
-      margin-top: 1px;
-      line-height: 1.35;
-    }
+    .popup-dish .popup-dish-name { display: block; font-weight: 600; color: var(--text); line-height: 1.2; margin-bottom: 2px; }
+    .popup-dish .popup-dish-brief { display: block; color: var(--muted); font-size: 0.75rem; line-height: 1.3; }
     .popup-dish .popup-dish-link {
       display: inline-block;
-      margin-top: 3px;
-      font-size: 0.7rem;
+      margin-top: 4px;
+      font-size: 0.75rem;
       color: var(--spice);
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
+      font-weight: 600;
     }
-    .popup-dish .popup-dish-link:hover {
-      text-decoration: underline;
-    }
-    .popup-fallback {
-      color: var(--muted);
-      font-style: italic;
-      font-size: 0.72rem;
-    }
-    .popup-record {
-      color: var(--muted);
-      margin-top: 3px;
-      font-size: 0.72rem;
-    }
-    .popup-record a {
-      color: var(--spice);
-      font-weight: 500;
-    }
-    .popup-record a:hover {
-      text-decoration: underline;
-    }
-    .popup-privacy {
-      color: var(--spice);
-      font-size: 0.72rem;
-      margin-top: 3px;
-    }
+    .popup-dish .popup-dish-link:hover { text-decoration: underline; }
+    
+    .popup-fallback { color: var(--muted); font-style: italic; font-size: 0.75rem; margin-top: 8px; }
+    .popup-record { color: var(--muted); margin-top: 2px; font-size: 0.8rem; }
+    .popup-privacy { color: var(--spice); font-size: 0.75rem; margin-top: 4px; font-weight: 500;}
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0; }
+
+    .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
+    .team-card { background: transparent; border-left: 2px solid var(--spice); padding: 0.6rem 0 0.6rem 1rem; }
+    .team-card h3 { font-family: var(--font-heading); font-size: 1.1rem; margin-bottom: 0.15rem; border: none; padding: 0; }
+    .team-card .role { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-bottom: 0.4rem; }
+    .team-card .institution { font-style: italic; font-family: var(--font-heading); color: var(--leaf); font-size: 0.85rem; margin-bottom: 0.5rem; }
+    .contact-link { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; color: var(--spice); font-weight: 500; }
+    .contact-link:hover { text-decoration: underline; color: var(--spice-hover); }
+
+    footer { background: var(--text); color: #fff; padding: 3.5rem 0 2.5rem; margin-top: 3rem; }
+    .footer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 2.5rem; margin-bottom: 1.5rem; }
+    .footer-brand h3 { font-family: var(--font-heading); font-size: 1.4rem; margin-bottom: 0.6rem; }
+    .footer-brand p { color: rgba(255,255,255,0.7); font-size: 0.85rem; max-width: 340px; }
+    .footer-contact h4 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 1rem; color: rgba(255,255,255,0.5); }
+    .footer-contact a { display: block; color: #fff; margin-bottom: 0.5rem; font-size: 0.95rem; }
+    .footer-contact a:hover { color: var(--spice); }
+    .footer-bottom { display: flex; justify-content: space-between; color: rgba(255,255,255,0.55); font-size: 0.75rem; flex-wrap: wrap; gap: 0.5rem; }
+    .footer-bottom a { color: rgba(255,255,255,0.75); }
+    .footer-bottom a:hover { color: #fff; }
 
     @media (max-width: 920px) {
-      .map-layout-row {
-        grid-template-columns: 1fr;
-      }
-      .map-col .map-wrap {
-        height: 380px;
-      }
+      .map-layout-row { grid-template-columns: 1fr; }
+      .map-wrap { height: 400px; }
     }
-    @media (max-width: 560px) {
-      .map-col .map-wrap {
-        height: 320px;
-      }
+    @media (max-width: 768px) {
+      .card-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
+      .mobile-menu-btn { display: block; }
+      .nav-links { display: none; flex-direction: column; position: absolute; top: 100%; left: 0; width: 100%; background: rgba(247, 245, 240, 0.98); padding: 1rem 0; border-bottom: 1px solid var(--border); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+      .nav-links.active { display: flex; }
+      .hero { padding: 3rem 0 2.5rem; }
+      .list-scroll { max-height: 280px; }
+      .footer-bottom { flex-direction: column; gap: 0.5rem; text-align: center; }
     }
-</style>
+  </style>
 </head>
 <body>
   <header class="site-header">
@@ -801,11 +566,11 @@
       </div>
     </section>
 
-        <section id="map">
+    <section id="map">
       <div class="container map-layout">
         <div class="section-header">
           <h2>Interactive Cultural Map</h2>
-          <p>Approved places in the archive, mapped by district. Click a district in the list to focus the map and filter the places; hover a marker to preview a recorded dish; click a dish name to open its full record.</p>
+          <p>Approved places in the archive, mapped by district. Click a district to view collected places; hover over a map marker to preview a recorded dish, and click the dish name for the full recipe.</p>
         </div>
 
         <div class="map-layout-row">
@@ -841,7 +606,7 @@
 
             <div class="district-hint">
               <strong>How this works</strong>
-              <p>Each <span class="muted">district</span> groups the places we have recorded there. Clicking a district focuses the map on those places. Markers show sampled dishes; the map is a snapshot of approved public records, not a live inventory.</p>
+              <p>Each district groups the places we have recorded there. Clicking a district focuses the map. Map markers show sampled dishes; it is a snapshot of approved public records, not a live inventory.</p>
             </div>
           </div>
 
@@ -857,7 +622,8 @@
         </div>
       </div>
     </section>
-<section id="team">
+    
+    <section id="team">
       <div class="container">
         <div class="section-header" style="margin-bottom: 1.5rem;">
           <h2>Principal Investigators</h2>
@@ -910,10 +676,10 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.js"></script>
 
   <script>
-    (function () {
+    document.addEventListener('DOMContentLoaded', function () {
       'use strict';
 
-      // ---------- Mobile menu ----------
+      // Mobile menu
       var menuBtn = document.querySelector('.mobile-menu-btn');
       var navLinks = document.querySelector('.nav-links');
       if (menuBtn && navLinks) {
@@ -929,7 +695,7 @@
         });
       }
 
-      // ---------- Map elements ----------
+      // Map elements
       var mapEl = document.getElementById('map-container');
       var listEl = document.getElementById('list');
       var countEl = document.getElementById('list-count');
@@ -939,14 +705,12 @@
 
       if (!mapEl) return;
 
-      // ---------- Safety: Leaflet present? ----------
       if (typeof window.L === 'undefined') {
         mapEl.innerHTML = '<div style="padding:3rem;text-align:center;color:#A33B24;"><strong>Unable to load map resources.</strong><br>Please check your internet connection and reload.</div>';
         if (countEl) countEl.textContent = 'Map unavailable';
         return;
       }
 
-      // ---------- Build a safe marker cluster group ----------
       var MarkerGroup = L.markerClusterGroup ? L.markerClusterGroup : null;
       var markerLayer = MarkerGroup ? new L.markerClusterGroup({
         showCoverageOnHover: false,
@@ -954,29 +718,23 @@
         disableClusteringAtZoom: 13
       }) : new L.layerGroup();
 
-      var map = L.map('map-container', {
-        center: [10.5, 77.0],
-        zoom: 7,
-        zoomControl: true,
-        attributionControl: true
-      });
+      var map = L.map('map-container', { center: [10.5, 77.0], zoom: 7, zoomControl: true, attributionControl: true });
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 18,
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       }).addTo(map);
       map.addLayer(markerLayer);
 
-      // ---------- Data stores ----------
       var markersByPlace = {};
       var dishTree = {};
       var placesByDistrict = {};
       var allPlaceIds = [];
 
-      // ---------- Helpers ----------
-      function escapeAttr(s) { return String(s).replace(/"/g, '&quot;'); }
-      function escapeHtml(s) { return String(s).replace(/[&<>"']/g, function (c) {
-        return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c];
-      }); }
+      function escapeHtml(s) { 
+        return String(s || '').replace(/[&<>"']/g, function (c) {
+          return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c];
+        }); 
+      }
 
       function pickFeaturedOrFirst(dishes) {
         for (var i = 0; i < dishes.length; i++) {
@@ -987,30 +745,30 @@
 
       function dishPopHTML(dish) {
         var src = dish && dish.image_small ? dish.image_small : '';
-        var img = src ? '<img src="' + escapeAttr(src) + '" alt="' + escapeAttr(dish.name) + '" loading="lazy" />' : '';
+        var img = src ? '<img src="' + escapeHtml(src) + '" alt="' + escapeHtml(dish.name) + '" loading="lazy" />' : '';
         var name = dish && dish.name ? dish.name : 'Recorded dish';
         var brief = dish && dish.brief ? dish.brief : '';
-        var link = '<a class="popup-dish-link" href="dish.html?dish_id=' + encodeURIComponent(dish.dish_id) + '">View recipe</a>';
-        if (img) {
-          return '<div class="popup-dish">' + img + '<div><span class="popup-dish-name">' + escapeHtml(name) + '</span>' +
-                 (brief ? '<span class="popup-dish-brief">' + escapeHtml(brief) + '</span>' : '') +
-                 link + '</div></div>';
-        }
-        return '<div class="popup-dish"><div><span class="popup-dish-name">' + escapeHtml(name) + '</span>' +
+        var link = '<a class="popup-dish-link" href="dish.html?dish_id=' + encodeURIComponent(dish.dish_id) + '">View recipe &rarr;</a>';
+        
+        return '<div class="popup-dish">' + 
+               (img ? img : '') + 
+               '<div><span class="popup-dish-name">' + escapeHtml(name) + '</span>' +
                (brief ? '<span class="popup-dish-brief">' + escapeHtml(brief) + '</span>' : '') +
                link + '</div></div>';
       }
 
       function popupHTML(p) {
-        var h = '<div style="font-weight:600;">' + escapeHtml(p.name || 'Unnamed place');
-        if (p.name_alt) h += ' <span style="color:#5b646b;font-weight:400;">(' + escapeHtml(p.name_alt) + ')</span>';
+        var h = '<div style="font-weight:600; font-size:1.05rem;">' + escapeHtml(p.name || 'Unnamed place');
+        if (p.name_alt) h += ' <span style="color:#5b646b;font-weight:400;font-size:0.9rem;">(' + escapeHtml(p.name_alt) + ')</span>';
         h += '</div>';
         h += '<div class="popup-record">' + escapeHtml(p.district || '') + ', ' + escapeHtml(p.state || '') + '</div>';
+        
         if (p.place_type === 'household') {
           h += '<div class="popup-privacy">Location generalized for privacy</div>';
         } else if (p.note) {
-          h += '<div class="popup-record">' + escapeHtml(p.note) + '</div>';
+          h += '<div class="popup-record" style="margin-top:4px;">' + escapeHtml(p.note) + '</div>';
         }
+        
         var dishes = dishTree[p.place_id];
         if (dishes && dishes.length) {
           h += dishPopHTML(pickFeaturedOrFirst(dishes));
@@ -1020,32 +778,38 @@
         return h;
       }
 
-      // ---------- Marker builder ----------
       function buildMarker(p) {
         var lat = p.lat, lon = p.lon;
         if (!lat || !lon || isNaN(lat) || isNaN(lon)) return null;
         var colorMap = { Kerala:'#2A4732', 'Tamil Nadu':'#A33B24', household:'#5b646b' };
         var fill = (p.place_type === 'household') ? colorMap.household : (colorMap[p.state] || '#1A1F22');
+        var baseRadius = (p.place_type === 'household') ? 5 : 7;
+        
         var m = L.circleMarker([lat, lon], {
-          radius: (p.place_type === 'household') ? 5 : 7,
+          radius: baseRadius,
           fillColor: fill,
           color: '#fff',
           weight: 1.5,
           opacity: 1,
           fillOpacity: 0.85
         });
-        m.bindPopup(popupHTML(p), { maxWidth: 200 });
+        
+        m.bindPopup(popupHTML(p), { maxWidth: 280, closeButton: true });
         m.placeId = p.place_id;
         m.properties = p;
 
-        if (dishTree[p.place_id] && dishTree[p.place_id].length) {
-          m.on('mouseover', function () { this.setRadius((p.place_type === 'household') ? 7 : 9); });
-          m.on('mouseout', function () { this.setRadius((p.place_type === 'household') ? 5 : 7); });
-        }
+        // Open popup on hover. We DO NOT close it on mouseout so user can click the link inside.
+        m.on('mouseover', function () { 
+          this.openPopup();
+          this.setRadius(baseRadius + 2); 
+        });
+        m.on('mouseout', function () { 
+          this.setRadius(baseRadius); 
+        });
+        
         return m;
       }
 
-      // ---------- Grouping ----------
       function groupPlaces(places) {
         placesByDistrict = {};
         places.forEach(function (p) {
@@ -1067,298 +831,199 @@
           allPlaceIds.push(p.place_id);
         });
         allPlaceIds.sort();
-        renderDistrictList();
-      }
-
-      // ---------- Load data ----------
-      var fallbackPlaces = [
-        { place_id:'PLACE-0001', name:'Palakkad', name_alt:'Palghat', district:'Palakkad', state:'Kerala', state_code:'KL', place_type:'town', note:'', lat:10.7867, lon:76.6548 },
-        { place_id:'PLACE-0002', name:'Thrissur', name_alt:'', district:'Thrissur', state:'Kerala', state_code:'KL', place_type:'town', note:'', lat:10.5276, lon:76.2144 },
-        { place_id:'PLACE-0003', name:'Kochi', name_alt:'Cochin', district:'Ernakulam', state:'Kerala', state_code:'KL', place_type:'port', note:'Historic Spice Route port city.', lat:9.9351, lon:76.2678 },
-        { place_id:'PLACE-0004', name:'Kozhikode', name_alt:'Calicut', district:'Kozhikode', state:'Kerala', state_code:'KL', place_type:'port', note:'Mappila cuisine heartland on the Malabar coast.', lat:11.2598, lon:75.7804 },
-        { place_id:'PLACE-0005', name:'Thiruvananthapuram', name_alt:'Trivandrum', district:'Thiruvananthapuram', state:'Kerala', state_code:'KL', place_type:'city', note:'Southern tip of the Kerala coastal belt.', lat:8.4855, lon:76.9319 },
-        { place_id:'PLACE-0006', name:'Kasaragod', name_alt:'', district:'Kasaragod', state:'Kerala', state_code:'KL', place_type:'town', note:'Northernmost Kerala district; historic spice trade.', lat:12.5089, lon:74.9853 },
-        { place_id:'PLACE-0007', name:'Chettinad', name_alt:'Chetti Nadu', district:'Sivaganga', state:'Tamil Nadu', state_code:'TN', place_type:'region', note:'Famous for rich, spice-heavy Chettinad cuisine.', lat:9.7264, lon:78.4039 },
-        { place_id:'PLACE-0008', name:'Madurai', name_alt:'', district:'Madurai', state:'Tamil Nadu', state_code:'TN', place_type:'city', note:'Meenakshi temple city; distinct Pandya-region foodways.', lat:9.9197, lon:78.1183 },
-        { place_id:'PLACE-0009', name:'Kongunadu', name_alt:'Kongu Nadu', district:'Coimbatore', state:'Tamil Nadu', state_code:'TN', place_type:'region', note:'Western Tamil Nadu; distinct Kongu culinary tradition.', lat:10.9815, lon:77.3439 },
-        { place_id:'PLACE-0010', name:'Nanjilnadu', name_alt:'Nanjil Nadu', district:'Kanyakumari', state:'Tamil Nadu', state_code:'TN', place_type:'region', note:'Southernmost Tamil Nadu; unique regional preparations.', lat:8.0175, lon:77.5139 },
-        { place_id:'PLACE-0011', name:'Trichy', name_alt:'Tiruchirappalli', district:'Tiruchirappalli', state:'Tamil Nadu', state_code:'TN', place_type:'city', note:'Central Tamil Nadu; Cauvery delta foodways.', lat:10.7850, lon:78.6974 },
-        { place_id:'PLACE-0012', name:'Household Kitchen A', name_alt:'', district:'Thrissur', state:'Kerala', state_code:'KL', place_type:'household', note:'Location generalized for participant privacy.', lat:10.6000, lon:76.3000 }
-      ];
-      var fallbackDishes = [
-        { dish_id:'DISH-00001', place_id:'PLACE-0002', name:'Vegetable Stew with Appam', cuisine:'Syrian Christian', brief:'A light coconut-milk stew with seasonal vegetables, tempered with whole spices and served with appam.', image_small:'./data/images/appam-stew.jpg', featured:true },
-        { dish_id:'DISH-00002', place_id:'PLACE-0001', name:'Killari Mutton Curry', cuisine:'Kerala Muslim', brief:'A slow-cooked mutton curry built on roasted spice powders and coconut oil.', image_small:'./data/images/killari-mutton.jpg', featured:false },
-        { dish_id:'DISH-00003', place_id:'PLACE-0003', name:'Kozhikode Halwa', cuisine:'Malabar', brief:'A warm, ghee-rich halwa made from jaggery and maida.', image_small:'./data/images/kozhikode-halwa.jpg', featured:true },
-        { dish_id:'DISH-00007', place_id:'PLACE-0005', name:'Kerala Beef Fry', cuisine:'Kerala', brief:'Signature Kerala beef slow-cooked with coconut oil and whole spices.', image_small:'./data/images/beef-fry.jpg', featured:false },
-        { dish_id:'DISH-00004', place_id:'PLACE-0007', name:'Chettinad Chicken', cuisine:'Chettinad', brief:'A fiery, aromatically layered chicken curry anchored by freshly roasted spice blends.', image_small:'./data/images/chettinad-chicken.jpg', featured:true },
-        { dish_id:'DISH-00005', place_id:'PLACE-0008', name:'Meen Kuzhambu', cuisine:'Pandya-region', brief:'A tangy tamarind fish curry from the Madurai region.', image_small:'./data/images/meen-kuzhambu.jpg', featured:false },
-        { dish_id:'DISH-00006', place_id:'PLACE-0009', name:'Kongunadu Sothu Kuzhambu', cuisine:'Kongunadu', brief:'A peppery tamarind-based gravy typical of Kongu Nadu.', image_small:'./data/images/sothu-kuzhambu.jpg', featured:false },
-        { dish_id:'DISH-00008', place_id:'PLACE-0010', name:'Nanjilnadu Crab Roast', cuisine:'Nanjil Nadu', brief:'A spiced, coconut-heavy crab roast from the southern tip of Tamil Nadu.', image_small:'./data/images/nanjil-crab.jpg', featured:false },
-        { dish_id:'DISH-00009', place_id:'PLACE-0011', name:'Cauvery Delta Mappillai Satham', cuisine:'Tamil Brahmin', brief:'A festive layered rice dish from the Cauvery delta region.', image_small:'./data/images/mappillai-satham.jpg', featured:false },
-        { dish_id:'DISH-00010', place_id:'PLACE-0004', name:'Kozhi Korma with Kappa', cuisine:'Mappila', brief:'A mild coconut-based chicken korma served with tapioca.', image_small:'./data/images/kozhi-korma.jpg', featured:false },
-        { dish_id:'DISH-00011', place_id:'PLACE-0006', name:'Kasaragod Pathiri with Koottu Curry', cuisine:'Kerala Muslim', brief:'A rice pathiri served with a mild mixed-vegetable and coconut koottu curry.', image_small:'./data/images/pathiri-koottu.jpg', featured:false },
-        { dish_id:'DISH-00012', place_id:'PLACE-0012', name:'Kudampuli Chicken Curry', cuisine:'Kerala', brief:'A tangy, mustard-anchored chicken curry using Malabar tamarind.', image_small:'./data/images/kudampuli-chicken.jpg', featured:false }
-      ];
-
-      function loadExternal() {
-        var pPlaces = new Promise(function (resolve) {
-          fetch('data/places.geojson')
-            .then(function (r) { if (!r.ok) throw new Error('places'); return r.json(); })
-            .then(function (geo) {
-              if (!geo || !geo.features || !geo.features.length) throw new Error('empty');
-              resolve(geo.features);
-            })
-            .catch(function () { resolve(null); });
-        });
-        var pDishes = new Promise(function (resolve) {
-          fetch('data/dishes.json')
-            .then(function (r) { if (!r.ok) throw new Error('dishes'); return r.json(); })
-            .then(function (bundle) {
-              if (!bundle || !bundle.dishes) throw new Error('empty');
-              resolve(bundle.dishes);
-            })
-            .catch(function () { resolve(null); });
-        });
-        return Promise.all([pPlaces, pDishes]).then(function (res) {
-          var feats = res[0], dishes = res[1];
-          var places = feats ? feats.map(function (f) {
-            var props = f.properties || {};
-            var coords = (f.geometry && f.geometry.type === 'Point') ? f.geometry.coordinates : null;
-            return Object.assign({}, props, {
-              place_id: props.place_id || '',
-              lat: coords ? coords[1] : null,
-              lon: coords ? coords[0] : null
-            });
-          }) : null;
-          if (!places) {
-            dishes = fallbackDishes;
-            places = fallbackPlaces;
-          }
-          dishTree = {};
-          (dishes || []).forEach(function (d) {
-            if (!d || !d.place_id) return;
-            if (!dishTree[d.place_id]) dishTree[d.place_id] = [];
-            dishTree[d.place_id].push(d);
-          });
-          ingest(places);
-        });
-      }
-
-      loadExternal();
-
-      // ---------- District tree (left panel) ----------
-      function renderDistrictList() {
-        if (!listEl) return;
-        var stateFilter = filterState ? filterState.value : 'all';
-        var typeFilter = filterType ? filterType.value : 'all';
-
-        var stateOrder = ['Kerala', 'Tamil Nadu'];
-        var states = {};
-        Object.keys(placesByDistrict).forEach(function (key) {
-          var st = key.split('|')[0];
-          if (!states[st]) states[st] = [];
-          states[st].push(key);
-        });
-
-        var frag = document.createDocumentFragment();
-
-        stateOrder.forEach(function (st) {
-          if (!states[st]) return;
-          if (stateFilter !== 'all' && st !== stateFilter) return;
-          var group = document.createElement('div');
-          group.className = 'district-group';
-
-          var header = document.createElement('button');
-          header.className = 'district-state';
-          var stPlaces = [];
-          states[st].forEach(function (key) {
-            placesByDistrict[key].forEach(function (pid) {
-              var item = markersByPlace[pid];
-              if (!item) return;
-              var p = item.props;
-              if (stateFilter !== 'all' && p.state !== stateFilter) return;
-              if (typeFilter !== 'all' && p.place_type !== typeFilter) return;
-              stPlaces.push(p);
-            });
-          });
-          header.innerHTML = escapeHtml(st) + '<span class="state-count">' + stPlaces.length + '</span>';
-          header.addEventListener('click', function () {
-            var roles = group.querySelector('.district-roles');
-            var open = roles.classList.toggle('open');
-            header.setAttribute('aria-expanded', open ? 'true' : 'false');
-          });
-          header.setAttribute('aria-expanded', 'false');
-          group.appendChild(header);
-
-          var roles = document.createElement('ul');
-          roles.className = 'district-roles';
-          states[st].forEach(function (key) {
-            var district = key.split('|')[1];
-            var li = document.createElement('li');
-            var btn = document.createElement('button');
-            btn.className = 'district-role';
-
-            var filteredPids = [];
-            placesByDistrict[key].forEach(function (pid) {
-              var item = markersByPlace[pid];
-              if (!item) return;
-              var p = item.props;
-              if (stateFilter !== 'all' && p.state !== stateFilter) return;
-              if (typeFilter !== 'all' && p.place_type !== typeFilter) return;
-              filteredPids.push(pid);
-            });
-
-            btn.setAttribute('data-place-id', filteredPids.length ? filteredPids[0] : '');
-            btn.innerHTML = '<span class="role-name">' + escapeHtml(district) + '</span><span class="role-count">' + filteredPids.length + '</span>';
-            btn.addEventListener('click', focusDistrict.bind(null, filteredPids));
-            li.appendChild(btn);
-            roles.appendChild(li);
-          });
-          group.appendChild(roles);
-          frag.appendChild(group);
-        });
-
-        listEl.innerHTML = '';
-        listEl.appendChild(frag);
-      }
-
-      function focusDistrict(pids) {
-        if (!pids.length || !map) return;
-        var bounds = L.latLngBounds([]);
-        pids.forEach(function (pid) {
-          var item = markersByPlace[pid];
-          if (item) bounds.extend(item.marker.getLatLng());
-        });
-        if (bounds.isValid()) {
-          map.fitBounds(bounds, { padding: [40, 40], maxZoom: 11 });
+        renderSidebarTree();
+        
+        // Auto-focus if arriving from a dish page
+        var params = new URLSearchParams(window.location.search);
+        var autoFocusId = params.get('place_id');
+        if (autoFocusId && markersByPlace[autoFocusId]) {
+          setTimeout(function() { focusPlace(autoFocusId, false); }, 500);
         }
-        document.querySelectorAll('.district-role').forEach(function (r) {
-          var pid = r.getAttribute('data-place-id');
-          r.classList.toggle('active-place', pid && pids.indexOf(pid) !== -1);
-        });
-        renderPlaceList(pids);
       }
 
-      // ---------- Compact place list (under the district rows) ----------
-      function renderPlaceList(scopedPids) {
+      // Sidebar Accordion Builder
+      function renderSidebarTree() {
         if (!listEl) return;
         var q = (searchInput ? searchInput.value : '').toLowerCase().trim();
         var stateFilter = filterState ? filterState.value : 'all';
         var typeFilter = filterType ? filterType.value : 'all';
 
-        var candidates = [];
-        allPlaceIds.forEach(function (pid) {
-          var item = markersByPlace[pid];
-          if (!item) return;
-          var p = item.props;
-          if (stateFilter !== 'all' && p.state !== stateFilter) return;
-          if (typeFilter !== 'all' && p.place_type !== typeFilter) return;
-          if (q) {
-            var hay = (p.name + ' ' + (p.name_alt || '') + ' ' + (p.district || '') + ' ' + (p.state || '') + ' ' + (p.place_type || '')).toLowerCase();
-            if (hay.indexOf(q) === -1) return;
-          }
-          if (scopedPids && scopedPids.indexOf(pid) === -1) return;
-          candidates.push(item);
-        });
-
-        if (!candidates.length) {
-          listEl.innerHTML = '<div class="list-empty">No places match the current filters.</div>';
-          if (countEl) countEl.textContent = '0 records';
-          return;
-        }
-
         var frag = document.createDocumentFragment();
-        candidates.forEach(function (item) {
-          var p = item.props;
-          var div = document.createElement('div');
-          div.className = 'place-row';
-          div.setAttribute('data-place-id', p.place_id);
-          var dishes = dishTree[p.place_id] || [];
+        var stateOrder = ['Kerala', 'Tamil Nadu'];
+        var totalVisiblePlaces = 0;
 
-          var name = document.createElement('div');
-          name.className = 'place-name';
-          name.innerHTML = '<strong>' + escapeHtml(p.name) + '</strong>';
-          var meta = document.createElement('div');
-          meta.className = 'place-meta';
-          meta.innerHTML = escapeHtml(p.district) + ', ' + escapeHtml(p.state);
-          if (p.name_alt) {
-            var alt = document.createElement('div');
-            alt.style.cssText = 'color:#5b646b;font-size:0.7rem;margin-top:1px;';
-            alt.textContent = p.name_alt;
-            meta.appendChild(alt);
-          }
-          div.appendChild(name);
-          div.appendChild(meta);
+        stateOrder.forEach(function (st) {
+          if (stateFilter !== 'all' && st !== stateFilter) return;
 
-          var chips = document.createElement('div');
-          chips.className = 'dish-chips';
-          dishes.forEach(function (d) {
-            var chip = document.createElement('a');
-            chip.className = 'dish-chip';
-            chip.href = 'dish.html?dish_id=' + encodeURIComponent(d.dish_id);
-            chip.textContent = d.name;
-            chips.appendChild(chip);
+          var districtKeys = Object.keys(placesByDistrict).filter(function(k) { return k.startsWith(st + '|'); });
+          if (districtKeys.length === 0) return;
+
+          var stateGroup = document.createElement('div');
+          stateGroup.className = 'district-group';
+
+          var stateHeader = document.createElement('button');
+          stateHeader.className = 'district-state';
+
+          var rolesUl = document.createElement('ul');
+          rolesUl.className = 'district-roles';
+          if (q) rolesUl.classList.add('open');
+
+          var stPlacesCount = 0;
+
+          districtKeys.forEach(function (key) {
+            var districtName = key.split('|')[1];
+            var pids = placesByDistrict[key];
+
+            var validPlaces = [];
+            pids.forEach(function(pid) {
+              var p = markersByPlace[pid].props;
+              if (typeFilter !== 'all' && p.place_type !== typeFilter) return;
+              if (q) {
+                var hay = (p.name + ' ' + (p.name_alt||'') + ' ' + (p.district||'') + ' ' + (p.state||'') + ' ' + (p.place_type||'')).toLowerCase();
+                if (hay.indexOf(q) === -1) return;
+              }
+              validPlaces.push(p);
+            });
+
+            if (validPlaces.length === 0) return;
+            stPlacesCount += validPlaces.length;
+            totalVisiblePlaces += validPlaces.length;
+
+            var li = document.createElement('li');
+
+            var distBtn = document.createElement('button');
+            distBtn.className = 'district-role';
+            distBtn.innerHTML = '<span class="role-name">' + escapeHtml(districtName) + '</span><span class="role-count">' + validPlaces.length + '</span>';
+
+            var pList = document.createElement('div');
+            pList.className = 'place-list';
+            if (q) pList.classList.add('open');
+
+            validPlaces.forEach(function(p) {
+              var pRowWrapper = document.createElement('div');
+              
+              var pRow = document.createElement('div');
+              pRow.className = 'place-row';
+              pRow.setAttribute('data-place-id', p.place_id);
+
+              var infoCol = document.createElement('div');
+              infoCol.innerHTML = '<div class="place-name">' + escapeHtml(p.name) + '</div>' + 
+                                  '<div class="place-meta">' + escapeHtml(p.place_type) + '</div>';
+              pRow.appendChild(infoCol);
+
+              var dishes = dishTree[p.place_id] || [];
+              var dishCount = document.createElement('div');
+              dishCount.className = 'dish-count';
+              dishCount.textContent = dishes.length + (dishes.length === 1 ? ' dish' : ' dishes');
+              pRow.appendChild(dishCount);
+
+              var chips = document.createElement('div');
+              chips.className = 'dish-chips';
+              dishes.forEach(function (d) {
+                var chip = document.createElement('a');
+                chip.className = 'dish-chip';
+                chip.href = 'dish.html?dish_id=' + encodeURIComponent(d.dish_id);
+                chip.textContent = d.name;
+                chip.addEventListener('click', function(e) { e.stopPropagation(); });
+                chips.appendChild(chip);
+              });
+
+              pRow.addEventListener('click', function() {
+                chips.classList.toggle('open');
+                focusPlace(p.place_id, true);
+              });
+
+              pRowWrapper.appendChild(pRow);
+              pRowWrapper.appendChild(chips);
+              pList.appendChild(pRowWrapper);
+            });
+
+            distBtn.addEventListener('click', function() {
+              var isOpen = pList.classList.toggle('open');
+              if (isOpen) {
+                var bounds = L.latLngBounds([]);
+                validPlaces.forEach(function(p) {
+                  bounds.extend(markersByPlace[p.place_id].marker.getLatLng());
+                });
+                if (bounds.isValid()) map.fitBounds(bounds, { padding: [40, 40], maxZoom: 11 });
+              }
+            });
+
+            li.appendChild(distBtn);
+            li.appendChild(pList);
+            rolesUl.appendChild(li);
           });
-          div.appendChild(chips);
 
-          div.addEventListener('click', function (e) {
-            if (chips.classList.contains('open')) {
-              chips.classList.remove('open');
-            } else {
-              document.querySelectorAll('.dish-chips.open').forEach(function (c) { c.classList.remove('open'); });
-              chips.classList.add('open');
-            }
-            focusPlace(p.place_id, true);
-            e.stopPropagation();
-          });
-          frag.appendChild(div);
+          if (stPlacesCount === 0) return;
+
+          stateHeader.innerHTML = escapeHtml(st) + '<span class="state-count">' + stPlacesCount + '</span>';
+          stateHeader.addEventListener('click', function() { rolesUl.classList.toggle('open'); });
+
+          stateGroup.appendChild(stateHeader);
+          stateGroup.appendChild(rolesUl);
+          frag.appendChild(stateGroup);
         });
 
         listEl.innerHTML = '';
-        listEl.appendChild(frag);
-        if (countEl) countEl.textContent = candidates.length + ' record' + (candidates.length === 1 ? '' : 's');
+        if (totalVisiblePlaces === 0) {
+          listEl.innerHTML = '<div class="list-empty">No places match the current filters.</div>';
+        } else {
+          listEl.appendChild(frag);
+        }
+        if (countEl) countEl.textContent = totalVisiblePlaces + ' record' + (totalVisiblePlaces === 1 ? '' : 's');
       }
 
-      function focusPlace(id, fromPlaceRow) {
+      function focusPlace(id, highlightRow) {
         var item = markersByPlace[id];
         if (!item || !map) return;
         var m = item.marker;
         map.setView(m.getLatLng(), Math.max(map.getZoom(), 11), { animate: true });
         m.openPopup();
-        if (fromPlaceRow) {
-          document.querySelectorAll('.place-row').forEach(function (el) {
+        
+        if (highlightRow) {
+          document.querySelectorAll('.place-row').forEach(function(el) {
             el.classList.toggle('active', el.getAttribute('data-place-id') === id);
           });
         }
       }
 
-      // ---------- Wire filter/search ----------
-      if (searchInput) searchInput.addEventListener('input', renderDistrictList);
-      if (filterState) filterState.addEventListener('change', renderDistrictList);
-      if (filterType) filterType.addEventListener('change', renderDistrictList);
+      // Load data
+      var pPlaces = fetch('data/places.geojson').then(function(r) { return r.ok ? r.json() : null; });
+      var pDishes = fetch('data/dishes.json').then(function(r) { return r.ok ? r.json() : null; });
 
-      map.on('moveend', function () {
-        var bounds = map.getBounds();
-        var best = null, bestDist = Infinity;
-        allPlaceIds.forEach(function (id) {
-          var item = markersByPlace[id];
-          if (!item || !bounds.contains(item.marker.getLatLng())) return;
-          var d = map.getCenter().distanceTo(item.marker.getLatLng());
-          if (d < bestDist) { bestDist = d; best = id; }
+      Promise.all([pPlaces, pDishes]).then(function (res) {
+        var geo = res[0], bundle = res[1];
+        
+        var places = (geo && geo.features) ? geo.features.map(function (f) {
+          var props = f.properties || {};
+          var coords = (f.geometry && f.geometry.type === 'Point') ? f.geometry.coordinates : null;
+          return Object.assign({}, props, { lat: coords ? coords[1] : null, lon: coords ? coords[0] : null });
+        }) : [];
+        
+        var dishes = (bundle && bundle.dishes) ? bundle.dishes : [];
+        
+        dishTree = {};
+        dishes.forEach(function (d) {
+          if (!d.place_id) return;
+          if (!dishTree[d.place_id]) dishTree[d.place_id] = [];
+          dishTree[d.place_id].push(d);
         });
-        if (best && listEl) {
-          document.querySelectorAll('.place-row').forEach(function (el) {
-            el.classList.toggle('active', el.getAttribute('data-place-id') === best);
-          });
+        
+        if (places.length > 0) {
+          ingest(places);
+        } else {
+          countEl.textContent = 'Data error';
         }
+      }).catch(function (err) {
+        console.error("Data load failed:", err);
       });
 
+      if (searchInput) searchInput.addEventListener('input', renderSidebarTree);
+      if (filterState) filterState.addEventListener('change', renderSidebarTree);
+      if (filterType) filterType.addEventListener('change', renderSidebarTree);
+
       window.addEventListener('resize', function () { map.invalidateSize(); });
-
-      // ---------- Initial render when data arrives ----------
-      // renderDistrictList is called by ingest(); after loadExternal resolves the UI is live.
-    })();
+    });
   </script>
-
 </body>
 </html>
