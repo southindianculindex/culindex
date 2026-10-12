@@ -6,12 +6,15 @@
   <meta name="description" content="CULINDEX is an evolving digital archive and cultural map documenting the vernacular cuisines of Kerala and Tamil Nadu." />
   <meta name="theme-color" content="#F7F5F0" />
   <title>CULINDEX | The Culinary Heritage Index</title>
+  
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.css" />
+  
   <style>
     :root {
       --bg: #F7F5F0;
@@ -447,7 +450,6 @@
       .list-scroll { max-height: 220px; }
       .footer-bottom { flex-direction: column; gap: 0.5rem; text-align: center; }
     }
-
     @media (max-width: 560px) {
       .map-controls .search-input { margin-left: 0; width: 100%; }
     }
@@ -625,14 +627,15 @@
     </div>
   </footer>
 
-      <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/zwW9t55a0iY+ROS6g=" crossorigin=""></script>
-  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+  <!-- CDNs updated to cdnjs -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.js"></script>
 
   <script>
-    (function () {
+    document.addEventListener('DOMContentLoaded', function () {
       'use strict';
 
-      // 1. Mobile Menu
+      // Mobile Menu
       var menuBtn = document.querySelector('.mobile-menu-btn');
       var navLinks = document.querySelector('.nav-links');
       if (menuBtn && navLinks) {
@@ -648,35 +651,28 @@
         });
       }
 
+      var mapEl = document.getElementById('map-container');
       var listEl = document.getElementById('list');
       var countEl = document.getElementById('list-count');
       var searchInput = document.getElementById('search-list');
       var filterState = document.getElementById('filter-state');
       var filterType = document.getElementById('filter-type');
 
-      // 2. Fortified Map Initialization (Handles ID mismatches)
-      var mapEl = document.getElementById('map-container') || document.getElementById('map');
-      if (!mapEl) {
-        if (countEl) countEl.textContent = 'Error: Map container not found';
-        console.error("CULINDEX: Map container element is missing from the HTML.");
-        return;
-      }
-      var mapId = mapEl.id;
+      if (!mapEl) return;
 
-      // 3. Ad-Blocker / Brave Shields Guard
-      if (typeof L === 'undefined') {
-        mapEl.innerHTML = '<div style="padding: 3rem; text-align: center; color: #A33B24;"><strong>Map libraries were blocked by your browser.</strong><br>If you are using Brave Shields or an ad-blocker, please disable them for this site and refresh.</div>';
+      // Fail-safe check
+      if (typeof window.L === 'undefined') {
+        mapEl.innerHTML = '<div style="padding: 3rem; text-align: center; color: #A33B24;"><strong>Unable to load map resources.</strong><br>Please check your internet connection or try a different network.</div>';
         if (countEl) countEl.textContent = 'Map unavailable';
         return;
       }
 
-      var map = L.map(mapId, { center: [10.5, 77.0], zoom: 7, zoomControl: true, attributionControl: true });
+      var map = L.map('map-container', { center: [10.5, 77.0], zoom: 7, zoomControl: true, attributionControl: true });
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 18,
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       }).addTo(map);
 
-      // Guard for MarkerCluster plugin if blocked
       var markerLayer;
       if (L.markerClusterGroup) {
         markerLayer = L.markerClusterGroup({
@@ -748,8 +744,7 @@
         { properties: { place_id:'PLACE-0003', name:'Kochi', name_alt:'Cochin', district:'Ernakulam', state:'Kerala', state_code:'KL', place_type:'port', note:'Historic Spice Route port city.' }, geometry:{ type:'Point', coordinates:[76.2678, 9.9351] } }
       ];
 
-      // 4. Safer Fetch for GitHub Pages
-      fetch('./data/places.geojson')
+      fetch('data/places.geojson')
         .then(function(response) {
           if (!response.ok) throw new Error('Network response failed');
           return response.json();
@@ -853,7 +848,7 @@
       });
 
       window.addEventListener('resize', function () { map.invalidateSize(); });
-    })();
+    });
   </script>
 </body>
 </html>
