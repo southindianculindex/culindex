@@ -6,9 +6,9 @@
   <meta name="description" content="CULINDEX is an evolving digital archive and cultural map documenting the vernacular cuisines of Kerala and Tamil Nadu." />
   <meta name="theme-color" content="#F7F5F0" />
   <title>CULINDEX | The Culinary Heritage Index</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
@@ -17,121 +17,443 @@
       --bg: #F7F5F0;
       --surface: #FFFFFF;
       --text: #1A1F22;
-      --muted: #646E73;
-      --border: rgba(26, 31, 34, 0.12);
+      --muted: #5b646b;
+      --border: rgba(26, 31, 34, 0.14);
       --spice: #A33B24;
       --spice-hover: #822C19;
       --leaf: #2A4732;
-      --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.03);
-      --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.06);
-      --radius: 4px;
+      --radius: 10px;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.03);
+      --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.04);
       --font-heading: "Lora", serif;
-      --font-body: "Inter", sans-serif;
-      --max-width: 1200px;
+      --font-body: "Inter", system-ui, sans-serif;
+      --content-width: 880px;
     }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    html { scroll-behavior: smooth; scroll-padding-top: 5rem; }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 4.5rem;
+    }
+
     body {
       font-family: var(--font-body);
       color: var(--text);
       background-color: var(--bg);
-      line-height: 1.7;
+      line-height: 1.6;
       -webkit-font-smoothing: antialiased;
       text-rendering: optimizeLegibility;
     }
-    a { color: inherit; text-decoration: none; transition: color 0.3s ease, background 0.3s ease; }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
     a:hover { color: var(--spice); }
+
     img, svg { display: block; max-width: 100%; }
-    .container { width: min(100% - 3rem, var(--max-width)); margin-inline: auto; }
+
+    .container {
+      width: min(100% - 1.5rem, var(--content-width));
+      margin-inline: auto;
+    }
 
     .site-header {
-      position: sticky; top: 0; z-index: 1000;
-      background: rgba(247, 245, 240, 0.95);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(247, 245, 240, 0.85);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       border-bottom: 1px solid var(--border);
     }
-    .nav { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 0; position: relative; }
-    .brand { font-family: var(--font-heading); font-size: 1.5rem; font-weight: 600; letter-spacing: 0.05em; }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.9rem 0;
+    }
+
+    .brand {
+      font-family: var(--font-heading);
+      font-size: 1.35rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
     .brand span { color: var(--spice); }
-    .nav-links { display: flex; gap: 2rem; align-items: center; }
-    .nav-links a { font-size: 0.9rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text); }
-    .mobile-menu-btn { display: none; background: none; border: none; cursor: pointer; color: var(--text); padding: 0.25rem; margin-left: 1rem; }
 
-    .hero { padding: 7rem 0 5rem; border-bottom: 1px solid var(--border); background: linear-gradient(to bottom, var(--surface) 0%, transparent 100%); }
-    .hero-content { max-width: 800px; }
-    .eyebrow { font-size: 0.85rem; font-weight: 600; color: var(--leaf); margin-bottom: 1.5rem; display: block; text-transform: uppercase; letter-spacing: 0.1em; }
-    .hero h1 { font-family: var(--font-heading); font-size: clamp(2.5rem, 6vw, 4.5rem); line-height: 1.1; font-weight: 500; margin-bottom: 1.5rem; }
-    .hero .subtitle { font-size: clamp(1.1rem, 3vw, 1.25rem); color: var(--muted); font-weight: 300; margin-bottom: 2.5rem; max-width: 600px; }
-    .btn { display: inline-flex; align-items: center; justify-content: center; padding: 1rem 2rem; border-radius: var(--radius); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500; border: 1px solid transparent; cursor: pointer; transition: background 0.3s ease, transform 0.2s ease; }
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+    .nav-links a {
+      font-size: 0.82rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+    }
+    .nav-links a:hover { color: var(--spice); }
+
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text);
+      padding: 0.25rem;
+    }
+
+    .hero {
+      padding: 4.5rem 0 3.5rem;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(to bottom, var(--surface) 0%, transparent 100%);
+    }
+    .hero-content { max-width: 720px; }
+
+    .eyebrow {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--leaf);
+      margin-bottom: 1rem;
+      display: block;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+    .hero h1 {
+      font-family: var(--font-heading);
+      font-size: clamp(2rem, 4.5vw, 3rem);
+      line-height: 1.1;
+      font-weight: 500;
+      margin-bottom: 1rem;
+    }
+    .hero .subtitle {
+      font-size: clamp(0.95rem, 2vw, 1.1rem);
+      color: var(--muted);
+      font-weight: 300;
+      max-width: 600px;
+    }
+    .hero-actions {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.7rem 1.4rem;
+      border-radius: var(--radius);
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 500;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.15s ease, color 0.2s ease;
+    }
     .btn-primary { background: var(--spice); color: #fff; }
-    .btn-primary:hover { background: var(--spice-hover); transform: translateY(-2px); }
+    .btn-primary:hover { background: var(--spice-hover); transform: translateY(-1px); }
+    .btn-ghost { background: transparent; color: var(--text); border-color: var(--border); }
+    .btn-ghost:hover { color: var(--spice); border-color: var(--spice); }
 
-    section { padding: 6rem 0; }
-    .section-header { margin-bottom: 4rem; max-width: 700px; }
-    .section-header h2 { font-family: var(--font-heading); font-size: clamp(2rem, 4vw, 2.5rem); font-weight: 500; color: var(--leaf); margin-bottom: 1rem; }
-    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem; }
-    .card { background: var(--surface); border: 1px solid var(--border); padding: 3rem; border-radius: var(--radius); box-shadow: var(--shadow-sm); transition: box-shadow 0.3s ease, transform 0.3s ease; }
-    .card:hover { box-shadow: var(--shadow-lg); transform: translateY(-4px); }
-    .card h3 { font-family: var(--font-heading); font-size: 1.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.75rem; }
+    section { padding: 3.5rem 0; }
 
-    .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
-    .team-card { background: transparent; border-left: 2px solid var(--spice); padding: 1rem 0 1rem 1.5rem; }
-    .team-card h3 { font-family: var(--font-heading); font-size: 1.4rem; margin-bottom: 0.25rem; border: none; padding: 0; }
-    .team-card .role { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 0.75rem; }
-    .team-card .institution { font-style: italic; font-family: var(--font-heading); color: var(--leaf); margin-bottom: 1rem; }
-    .contact-link { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: var(--spice); font-weight: 500; }
-    .contact-link:hover { text-decoration: underline; color: var(--spice-hover); }
+    .section-header { margin-bottom: 2rem; max-width: 680px; }
+    .section-header h2 {
+      font-family: var(--font-heading);
+      font-size: clamp(1.4rem, 3vw, 1.8rem);
+      font-weight: 500;
+      color: var(--leaf);
+      margin-bottom: 0.5rem;
+    }
+    .section-header p {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
 
-    .map-controls { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; align-items: center; }
-    .map-controls label { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-right: 0.25rem; }
-    .filter-select, .search-input { font: inherit; padding: 0.5rem 0.75rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); color: var(--text); font-size: 0.9rem; }
-    .filter-select:focus, .search-input:focus { outline: 2px solid var(--spice); outline-offset: 1px; }
-    .map-wrap { position: relative; width: 100%; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-sm); }
-    .map-legend { position: absolute; bottom: 1rem; right: 1rem; z-index: 1000; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.75rem 1rem; font-size: 0.8rem; color: var(--muted); box-shadow: var(--shadow-sm); line-height: 1.5; }
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 1.4rem 1.5rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow 0.2s ease, transform 0.2s ease;
+    }
+    .card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+    .card h3 {
+      font-family: var(--font-heading);
+      font-size: 1.1rem;
+      margin-bottom: 0.6rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.6rem;
+    }
+    .card p { color: var(--muted); font-size: 0.92rem; }
+    .card p + p { margin-top: 0.5rem; }
+
+    .card-strong { border-top: 3px solid var(--leaf); }
+    .card-strong h3 { border: none; padding: 0; }
+
+    .method-list { color: var(--muted); font-size: 0.92rem; margin: 0; padding-left: 1.1rem; }
+    .method-list li { margin-bottom: 0.35rem; }
+
+    #regions {
+      background-color: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .map-controls {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.75rem;
+      align-items: center;
+    }
+    .map-controls label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-right: 0.2rem;
+    }
+    .filter-select, .search-input {
+      font: inherit;
+      padding: 0.4rem 0.6rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--surface);
+      color: var(--text);
+      font-size: 0.82rem;
+    }
+    .filter-select:focus, .search-input:focus {
+      outline: 2px solid var(--spice);
+      outline-offset: 1px;
+    }
+    .search-input { margin-left: auto; }
+
+    .map-wrap {
+      position: relative;
+      width: 100%;
+      height: 420px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      background: var(--surface);
+    }
+    .map-legend {
+      position: absolute;
+      bottom: 0.5rem;
+      right: 0.5rem;
+      z-index: 1000;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.4rem 0.6rem;
+      font-size: 0.72rem;
+      color: var(--muted);
+      box-shadow: var(--shadow-sm);
+      line-height: 1.4;
+      backdrop-filter: blur(2px);
+    }
     .map-legend strong { color: var(--text); }
-    .leaflet-popup-content-wrapper { border-radius: 4px; }
-    .leaflet-popup-content { margin: 12px 14px; font-family: var(--font-body); }
-    .popup-record { font-size: 0.9rem; color: var(--muted); margin-top: 4px; }
+
+    .leaflet-popup-content-wrapper { border-radius: 6px; }
+    .leaflet-popup-content {
+      margin: 10px 12px;
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+    }
+    .popup-name { font-weight: 600; }
+    .popup-record { color: var(--muted); margin-top: 3px; }
     .popup-record a { color: var(--spice); font-weight: 500; }
     .popup-record a:hover { text-decoration: underline; }
+    .popup-privacy { color: var(--spice); font-size: 0.78rem; margin-top: 3px; }
 
-    .list-panel { margin-top: 2rem; }
-    .list-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem; }
-    .list-head h3 { font-family: var(--font-heading); font-size: 1.2rem; color: var(--leaf); }
-    .list-head .count { color: var(--muted); font-size: 0.9rem; }
-    .list-scroll { max-height: 420px; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
-    .list-item { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; padding: 0.85rem 1rem; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.15s ease; }
+    .list-panel { margin-top: 1rem; }
+    .list-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 0.5rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .list-head h3 {
+      font-family: var(--font-heading);
+      font-size: 1rem;
+      color: var(--leaf);
+    }
+    .list-head .count { color: var(--muted); font-size: 0.8rem; }
+    .list-scroll {
+      max-height: 280px;
+      overflow-y: auto;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--surface);
+    }
+    .list-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.6rem 0.75rem;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
     .list-item:last-child { border-bottom: 0; }
     .list-item:hover { background: rgba(163, 59, 36, 0.04); }
     .list-item.active { background: rgba(42, 71, 50, 0.06); }
-    .list-item .name { font-weight: 500; }
-    .list-item .name small { color: var(--muted); font-weight: 400; display: block; font-size: 0.8rem; margin-top: 2px; }
-    .list-item .meta { text-align: right; color: var(--muted); font-size: 0.8rem; white-space: nowrap; }
-    .list-item .meta .ptype { text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.7rem; color: var(--leaf); margin-bottom: 2px; }
-    .list-empty { padding: 2rem; text-align: center; color: var(--muted); font-size: 0.9rem; }
+    .list-item .name { font-weight: 500; font-size: 0.85rem; }
+    .list-item .name small {
+      color: var(--muted);
+      font-weight: 400;
+      display: block;
+      font-size: 0.72rem;
+      margin-top: 2px;
+    }
+    .list-item .meta { text-align: right; color: var(--muted); font-size: 0.72rem; white-space: nowrap; }
+    .list-item .meta .ptype {
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-size: 0.62rem;
+      color: var(--leaf);
+      margin-bottom: 2px;
+    }
+    .list-empty {
+      padding: 1.5rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
 
-    footer { background: var(--text); color: #fff; padding: 5rem 0 3rem; margin-top: 4rem; }
-    .footer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 4rem; margin-bottom: 2rem; }
-    .footer-brand h3 { font-family: var(--font-heading); font-size: 1.75rem; margin-bottom: 1rem; }
-    .footer-brand p { color: rgba(255,255,255,0.7); max-width: 400px; }
-    .footer-contact h4 { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1.5rem; color: rgba(255,255,255,0.5); }
-    .footer-contact a { display: block; color: #fff; margin-bottom: 0.75rem; font-size: 1.1rem; }
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+    }
+    .team-card {
+      background: transparent;
+      border-left: 2px solid var(--spice);
+      padding: 0.6rem 0 0.6rem 1rem;
+    }
+    .team-card h3 {
+      font-family: var(--font-heading);
+      font-size: 1.1rem;
+      margin-bottom: 0.15rem;
+      border: none;
+      padding: 0;
+    }
+    .team-card .role {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 0.4rem;
+    }
+    .team-card .institution {
+      font-style: italic;
+      font-family: var(--font-heading);
+      color: var(--leaf);
+      font-size: 0.85rem;
+      margin-bottom: 0.5rem;
+    }
+    .contact-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+      color: var(--spice);
+      font-weight: 500;
+    }
+    .contact-link:hover { text-decoration: underline; color: var(--spice-hover); }
+
+    footer {
+      background: var(--text);
+      color: #fff;
+      padding: 3.5rem 0 2.5rem;
+      margin-top: 3rem;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding-bottom: 2.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .footer-brand h3 {
+      font-family: var(--font-heading);
+      font-size: 1.4rem;
+      margin-bottom: 0.6rem;
+    }
+    .footer-brand p { color: rgba(255,255,255,0.7); font-size: 0.85rem; max-width: 340px; }
+    .footer-contact h4 {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 1rem;
+      color: rgba(255,255,255,0.5);
+    }
+    .footer-contact a {
+      display: block;
+      color: #fff;
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
+    }
     .footer-contact a:hover { color: var(--spice); }
-    .footer-bottom { display: flex; justify-content: space-between; color: rgba(255,255,255,0.5); font-size: 0.85rem; flex-wrap: wrap; gap: 0.5rem; }
-    .footer-bottom a { color: rgba(255,255,255,0.7); }
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      color: rgba(255,255,255,0.55);
+      font-size: 0.75rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .footer-bottom a { color: rgba(255,255,255,0.75); }
     .footer-bottom a:hover { color: #fff; }
 
     @media (max-width: 768px) {
-      .grid-2, .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
+      .card-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
       .mobile-menu-btn { display: block; }
-      .nav-links { display: none; flex-direction: column; position: absolute; top: 100%; left: 0; width: 100%; background: rgba(247, 245, 240, 0.98); padding: 1.5rem 0; border-bottom: 1px solid var(--border); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+      .nav-links {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: rgba(247, 245, 240, 0.98);
+        padding: 1rem 0;
+        border-bottom: 1px solid var(--border);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+      }
       .nav-links.active { display: flex; }
-      .hero { padding: 4rem 0; }
-      .card { padding: 2rem; }
-      .footer-bottom { flex-direction: column; gap: 1rem; text-align: center; }
-      .map-legend { bottom: 0.5rem; right: 0.5rem; font-size: 0.75rem; padding: 0.5rem 0.75rem; }
-      .list-scroll { max-height: 300px; }
+      .hero { padding: 3rem 0 2.5rem; }
+      .map-wrap { height: 340px; }
+      .list-scroll { max-height: 220px; }
+      .footer-bottom { flex-direction: column; gap: 0.5rem; text-align: center; }
+    }
+
+    @media (max-width: 560px) {
+      .map-controls .search-input { margin-left: 0; width: 100%; }
     }
   </style>
 </head>
@@ -140,7 +462,7 @@
     <div class="container nav">
       <a href="#about" class="brand">CUL<span>INDEX</span></a>
       <button class="mobile-menu-btn" aria-label="Toggle navigation" aria-expanded="false">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <line x1="3" y1="12" x2="21" y2="12"></line>
           <line x1="3" y1="6" x2="21" y2="6"></line>
           <line x1="3" y1="18" x2="21" y2="18"></line>
@@ -161,7 +483,10 @@
         <span class="eyebrow">Digital Archive in Progress</span>
         <h1>The Culinary Heritage Index</h1>
         <p class="subtitle">An evolving cultural map documenting the hyper-regional vernacular cuisines, agricultural ties, and trade histories of Kerala and Tamil Nadu.</p>
-        <a href="#map" class="btn btn-primary">Explore the Archive</a>
+        <div class="hero-actions">
+          <a href="#map" class="btn btn-primary">Explore the Archive</a>
+          <a href="#about" class="btn btn-ghost">Read the project</a>
+        </div>
       </div>
     </section>
 
@@ -171,37 +496,39 @@
           <h2>Documenting Foodways</h2>
           <p>Moving beyond restaurant menus to record the foods people actually cook, preserve, adapt, and inherit across generations in Southern India.</p>
         </div>
-        <div class="grid-2">
-          <div class="card">
+        <div class="card-grid">
+          <div class="card card-strong">
             <h3>Project Scope</h3>
-            <p style="margin-bottom: 1rem; color: var(--muted);">From the spice-heavy Mappila kitchens of the Malabar coast to the sun-dried, layered flavors of Chettinad, the archive treats food as cultural memory.</p>
-            <p style="color: var(--muted);">We are currently in <strong>Phase 1: Data Collection</strong>, compiling household recipes, seasonal variations, ingredient origins, and oral histories.</p>
+            <p>From the spice-heavy Mappila kitchens of the Malabar coast to the sun-dried, layered flavors of Chettinad, the archive treats food as cultural memory.</p>
+            <p>We are currently in <strong>Phase 1: Data Collection</strong>, compiling household recipes, seasonal variations, ingredient origins, and oral histories.</p>
           </div>
           <div class="card">
             <h3>The Methodology</h3>
-            <p style="color: var(--muted); margin-bottom: 0.5rem;">• Normalizing hyper-local ingredient terminology.</p>
-            <p style="color: var(--muted); margin-bottom: 0.5rem;">• Tracing historical trade and migration impacts.</p>
-            <p style="color: var(--muted); margin-bottom: 0.5rem;">• Linking local produce systems to geography.</p>
-            <p style="color: var(--muted);">• Preparing datasets for GIS spatial mapping.</p>
+            <ul class="method-list">
+              <li>Normalizing hyper-local ingredient terminology.</li>
+              <li>Tracing historical trade and migration impacts.</li>
+              <li>Linking local produce systems to geography.</li>
+              <li>Preparing datasets for GIS spatial mapping.</li>
+            </ul>
           </div>
         </div>
       </div>
     </section>
 
-    <section id="regions" style="background-color: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+    <section id="regions">
       <div class="container">
         <div class="section-header">
           <h2>Vernacular Landscapes</h2>
           <p>Categorizing cuisines by micro-regions, indigenous communities, and historical trade routes.</p>
         </div>
-        <div class="grid-2">
-          <article class="card" style="box-shadow: none; border-top: 3px solid var(--leaf);">
+        <div class="card-grid">
+          <article class="card card-strong">
             <h3>Kerala</h3>
-            <p style="color: var(--muted);">Documenting the nuances of Syrian Christian, Mappila, Tribal, and Namboothiri foodways, tracing the historical impact of the Spice Route from Kasaragod to Thiruvananthapuram.</p>
+            <p>Documenting the nuances of Syrian Christian, Mappila, Tribal, and Namboothiri foodways, tracing the historical impact of the Spice Route from Kasaragod to Thiruvananthapuram.</p>
           </article>
-          <article class="card" style="box-shadow: none; border-top: 3px solid var(--leaf);">
+          <article class="card card-strong">
             <h3>Tamil Nadu</h3>
-            <p style="color: var(--muted);">Cataloging the distinct regional preparations of Kongunadu, Chettinad, Madurai, and Nanjilnadu, with attention to agricultural ties and indigenous ingredients.</p>
+            <p>Cataloging the distinct regional preparations of Kongunadu, Chettinad, Madurai, and Nanjilnadu, with attention to agricultural ties and indigenous ingredients.</p>
           </article>
         </div>
       </div>
@@ -213,6 +540,7 @@
           <h2>Interactive Cultural Map</h2>
           <p>Approved places in the archive, mapped. Records with private or sensitive locations are omitted or generalized; the level of precision is noted on each marker.</p>
         </div>
+
         <div class="map-controls">
           <label for="filter-state">State</label>
           <select id="filter-state" class="filter-select">
@@ -220,6 +548,7 @@
             <option value="Kerala">Kerala</option>
             <option value="Tamil Nadu">Tamil Nadu</option>
           </select>
+
           <label for="filter-type">Type</label>
           <select id="filter-type" class="filter-select">
             <option value="all">All</option>
@@ -229,15 +558,18 @@
             <option value="region">Region</option>
             <option value="household">Household</option>
           </select>
+
           <label for="search-list" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);">Search places</label>
-          <input type="search" id="search-list" class="search-input" placeholder="Search places…" style="margin-left:auto;" />
+          <input type="search" id="search-list" class="search-input" placeholder="Search places…" />
         </div>
+
         <div class="map-wrap" id="map"></div>
         <div class="map-legend">
-          <strong>● Place marker</strong><br/>
-          Clusters group nearby points.<br/>
+          <strong>● Place marker</strong><br />
+          Clusters group nearby points.<br />
           Generalized locations are flagged in popups.
         </div>
+
         <div class="list-panel">
           <div class="list-head">
             <h3>Places in the Archive</h3>
@@ -248,9 +580,9 @@
       </div>
     </section>
 
-    <section id="team" style="background-color: var(--surface); border-top: 1px solid var(--border);">
+    <section id="team">
       <div class="container">
-        <div class="section-header" style="margin-bottom: 3rem;">
+        <div class="section-header" style="margin-bottom: 1.5rem;">
           <h2>Principal Investigators</h2>
         </div>
         <div class="team-grid">
@@ -259,16 +591,16 @@
             <h3>Dr. Gigy J. Alex</h3>
             <div class="institution">Indian Institute of Space Science and Technology, Thiruvananthapuram</div>
             <a href="mailto:gigyjalex@gmail.com" class="contact-link">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
               gigyjalex@gmail.com
             </a>
           </div>
           <div class="team-card">
-            <div class="role">Co-Principal Investigator</div>
+            <div class="role">Principal Investigator</div>
             <h3>Dr. Anu Kuriakose</h3>
             <div class="institution">National Institute of Technology, Trichy</div>
             <a href="mailto:anuk@nitt.edu" class="contact-link">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
               anuk@nitt.edu
             </a>
           </div>
@@ -359,18 +691,18 @@
         ];
       }
 
-      var colorMap = { Kerala: '#2A4732', 'Tamil Nadu': '#A33B24', household: '#646E73' };
+      var colorMap = { Kerala: '#2A4732', 'Tamil Nadu': '#A33B24', household: '#5b646b' };
       function markerColor(p) {
         if (p.place_type === 'household') return colorMap.household;
         return colorMap[p.state] || '#1A1F22';
       }
       function popupHTML(p) {
         var h = '<div class="popup-name"><strong>' + (p.name || 'Unnamed place') + '</strong>';
-        if (p.name_alt) h += ' <span style="color:#646E73;font-weight:400;">(' + p.name_alt + ')</span>';
+        if (p.name_alt) h += ' <span style="color:#5b646b;font-weight:400;">(' + p.name_alt + ')</span>';
         h += '</div>';
         h += '<div class="popup-record">' + (p.district || '') + ', ' + (p.state || '') + '</div>';
         if (p.place_type === 'household') {
-          h += '<div class="popup-record" style="color:#A33B24;">Location generalized for privacy</div>';
+          h += '<div class="popup-privacy">Location generalized for privacy</div>';
         } else if (p.note) {
           h += '<div class="popup-record">' + p.note + '</div>';
         }
