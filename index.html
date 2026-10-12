@@ -625,14 +625,14 @@
     </div>
   </footer>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/zwW9t55a0iY+ROS6g=" crossorigin=""></script>
+      <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/zwW9t55a0iY+ROS6g=" crossorigin=""></script>
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 
   <script>
     (function () {
       'use strict';
 
-      // Mobile Menu
+      // 1. Mobile Menu
       var menuBtn = document.querySelector('.mobile-menu-btn');
       var navLinks = document.querySelector('.nav-links');
       if (menuBtn && navLinks) {
@@ -648,33 +648,50 @@
         });
       }
 
-      // Initialize Map Element
-      var mapEl = document.getElementById('map-container');
-      if (!mapEl) return;
-
-      var map = L.map('map-container', { center: [10.5, 77.0], zoom: 7, zoomControl: true, attributionControl: true });
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 18,
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-      }).addTo(map);
-
-      var markerLayer = L.markerClusterGroup({
-        showCoverageOnHover: false,
-        spiderfyOnMaxZoom: true,
-        disableClusteringAtZoom: 13
-      });
-      map.addLayer(markerLayer);
-
-      var markersByPlace = {};
-      var placeIds = [];
-
       var listEl = document.getElementById('list');
       var countEl = document.getElementById('list-count');
       var searchInput = document.getElementById('search-list');
       var filterState = document.getElementById('filter-state');
       var filterType = document.getElementById('filter-type');
 
-      // Function to parse GeoJSON and render to map
+      // 2. Fortified Map Initialization (Handles ID mismatches)
+      var mapEl = document.getElementById('map-container') || document.getElementById('map');
+      if (!mapEl) {
+        if (countEl) countEl.textContent = 'Error: Map container not found';
+        console.error("CULINDEX: Map container element is missing from the HTML.");
+        return;
+      }
+      var mapId = mapEl.id;
+
+      // 3. Ad-Blocker / Brave Shields Guard
+      if (typeof L === 'undefined') {
+        mapEl.innerHTML = '<div style="padding: 3rem; text-align: center; color: #A33B24;"><strong>Map libraries were blocked by your browser.</strong><br>If you are using Brave Shields or an ad-blocker, please disable them for this site and refresh.</div>';
+        if (countEl) countEl.textContent = 'Map unavailable';
+        return;
+      }
+
+      var map = L.map(mapId, { center: [10.5, 77.0], zoom: 7, zoomControl: true, attributionControl: true });
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
+
+      // Guard for MarkerCluster plugin if blocked
+      var markerLayer;
+      if (L.markerClusterGroup) {
+        markerLayer = L.markerClusterGroup({
+          showCoverageOnHover: false,
+          spiderfyOnMaxZoom: true,
+          disableClusteringAtZoom: 13
+        });
+      } else {
+        markerLayer = L.layerGroup();
+      }
+      map.addLayer(markerLayer);
+
+      var markersByPlace = {};
+      var placeIds = [];
+
       function processFeatures(features) {
         var colorMap = { Kerala: '#2A4732', 'Tamil Nadu': '#A33B24', household: '#5b646b' };
         
@@ -693,7 +710,7 @@
           } else if (p.note) {
             h += '<div class="popup-record">' + p.note + '</div>';
           }
-          h += '<div class="popup-record"><a href="#record-' + p.place_id + '">View record</a> (pending)</div>';
+          h += '<div class="popup-record" style="margin-top:6px;"><a href="#record-' + p.place_id + '">View record</a> (pending)</div>';
           return h;
         }
 
@@ -725,28 +742,30 @@
         renderList();
       }
 
-      // Hardcoded Fallback Data just in case the fetch fails
       var fallbackFeatures = [
         { properties: { place_id:'PLACE-0001', name:'Palakkad', name_alt:'Palghat', district:'Palakkad', state:'Kerala', state_code:'KL', place_type:'town', note:'' }, geometry:{ type:'Point', coordinates:[76.6548, 10.7867] } },
         { properties: { place_id:'PLACE-0002', name:'Thrissur', name_alt:'', district:'Thrissur', state:'Kerala', state_code:'KL', place_type:'town', note:'' }, geometry:{ type:'Point', coordinates:[76.2144, 10.5276] } },
         { properties: { place_id:'PLACE-0003', name:'Kochi', name_alt:'Cochin', district:'Ernakulam', state:'Kerala', state_code:'KL', place_type:'port', note:'Historic Spice Route port city.' }, geometry:{ type:'Point', coordinates:[76.2678, 9.9351] } }
       ];
 
-      // CORRECTED: Asynchronous Fetch Request
-      fetch('data/places.geojson')
+      // 4. Safer Fetch for GitHub Pages
+      fetch('./data/places.geojson')
         .then(function(response) {
-          if (!response.ok) throw new Error('Network response was not ok');
+          if (!response.ok) throw new Error('Network response failed');
           return response.json();
         })
         .then(function(geo) {
-          processFeatures(geo.features);
+          if (geo && geo.features) {
+            processFeatures(geo.features);
+          } else {
+            throw new Error('Invalid GeoJSON');
+          }
         })
         .catch(function(error) {
-          console.warn('Could not load data/places.geojson, falling back to local data.', error);
+          console.warn('CULINDEX: Could not load geojson remotely, using local fallback.', error);
           processFeatures(fallbackFeatures);
         });
 
-      // Function to render the sidebar list based on current filters
       function renderList() {
         var q = (searchInput ? searchInput.value : '').toLowerCase().trim();
         var state = filterState ? filterState.value : 'all';
