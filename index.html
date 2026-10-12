@@ -46,11 +46,7 @@
       text-rendering: optimizeLegibility;
     }
 
-    a {
-      color: inherit;
-      text-decoration: none;
-      transition: color 0.2s ease;
-    }
+    a { color: inherit; text-decoration: none; transition: color 0.2s ease; }
     a:hover { color: var(--spice); }
 
     img, svg { display: block; max-width: 100%; }
@@ -563,7 +559,7 @@
           <input type="search" id="search-list" class="search-input" placeholder="Search places…" />
         </div>
 
-        <div class="map-wrap" id="map"></div>
+        <div class="map-wrap" id="map-container"></div>
         <div class="map-legend">
           <strong>● Place marker</strong><br />
           Clusters group nearby points.<br />
@@ -573,7 +569,7 @@
         <div class="list-panel">
           <div class="list-head">
             <h3>Places in the Archive</h3>
-            <span class="count" id="list-count">12 records</span>
+            <span class="count" id="list-count">Loading records...</span>
           </div>
           <div class="list-scroll" id="list"></div>
         </div>
@@ -636,6 +632,7 @@
     (function () {
       'use strict';
 
+      // Mobile Menu
       var menuBtn = document.querySelector('.mobile-menu-btn');
       var navLinks = document.querySelector('.nav-links');
       if (menuBtn && navLinks) {
@@ -651,10 +648,11 @@
         });
       }
 
-      var mapEl = document.getElementById('map');
+      // Initialize Map Element
+      var mapEl = document.getElementById('map-container');
       if (!mapEl) return;
 
-      var map = L.map('map', { center: [10.5, 77.0], zoom: 7, zoomControl: true, attributionControl: true });
+      var map = L.map('map-container', { center: [10.5, 77.0], zoom: 7, zoomControl: true, attributionControl: true });
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 18,
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -665,84 +663,96 @@
         spiderfyOnMaxZoom: true,
         disableClusteringAtZoom: 13
       });
-
-      var features = [];
-      var markersByPlace = {};
-
-      try {
-        var resp = fetch('data/places.geojson');
-        var geo = resp.ok ? resp.json() : null;
-        if (!geo) throw new Error('GeoJSON unavailable');
-        features = geo.features;
-      } catch (e) {
-        features = [
-          { properties: { place_id:'PLACE-0001', name:'Palakkad', name_alt:'Palghat', district:'Palakkad', state:'Kerala', state_code:'KL', place_type:'town', note:'' }, geometry:{ type:'Point', coordinates:[76.6548, 10.7867] } },
-          { properties: { place_id:'PLACE-0002', name:'Thrissur', name_alt:'', district:'Thrissur', state:'Kerala', state_code:'KL', place_type:'town', note:'' }, geometry:{ type:'Point', coordinates:[76.2144, 10.5276] } },
-          { properties: { place_id:'PLACE-0003', name:'Kochi', name_alt:'Cochin', district:'Ernakulam', state:'Kerala', state_code:'KL', place_type:'port', note:'Historic Spice Route port city.' }, geometry:{ type:'Point', coordinates:[76.2678, 9.9351] } },
-          { properties: { place_id:'PLACE-0004', name:'Kozhikode', name_alt:'Calicut', district:'Kozhikode', state:'Kerala', state_code:'KL', place_type:'port', note:'Mappila cuisine heartland on the Malabar coast.' }, geometry:{ type:'Point', coordinates:[75.7804, 11.2598] } },
-          { properties: { place_id:'PLACE-0005', name:'Thiruvananthapuram', name_alt:'Trivandrum', district:'Thiruvananthapuram', state:'Kerala', state_code:'KL', place_type:'city', note:'Southern tip of the Kerala coastal belt.' }, geometry:{ type:'Point', coordinates:[76.9319, 8.4855] } },
-          { properties: { place_id:'PLACE-0006', name:'Kasaragod', name_alt:'', district:'Kasaragod', state:'Kerala', state_code:'KL', place_type:'town', note:'Northernmost Kerala district; historic spice trade.' }, geometry:{ type:'Point', coordinates:[74.9853, 12.5089] } },
-          { properties: { place_id:'PLACE-0007', name:'Chettinad', name_alt:'Chetti Nadu', district:'Sivaganga', state:'Tamil Nadu', state_code:'TN', place_type:'region', note:'Famous for rich, spice-heavy Chettinad cuisine.' }, geometry:{ type:'Point', coordinates:[78.4039, 9.7264] } },
-          { properties: { place_id:'PLACE-0008', name:'Madurai', name_alt:'', district:'Madurai', state:'Tamil Nadu', state_code:'TN', place_type:'city', note:'Meenakshi temple city; distinct Pandya-region foodways.' }, geometry:{ type:'Point', coordinates:[78.1183, 9.9197] } },
-          { properties: { place_id:'PLACE-0009', name:'Kongunadu', name_alt:'Kongu Nadu', district:'Coimbatore', state:'Tamil Nadu', state_code:'TN', place_type:'region', note:'Western Tamil Nadu; distinct Kongu culinary tradition.' }, geometry:{ type:'Point', coordinates:[77.3439, 10.9815] } },
-          { properties: { place_id:'PLACE-0010', name:'Nanjilnadu', name_alt:'Nanjil Nadu', district:'Kanyakumari', state:'Tamil Nadu', state_code:'TN', place_type:'region', note:'Southernmost Tamil Nadu; unique regional preparations.' }, geometry:{ type:'Point', coordinates:[77.5139, 8.0175] } },
-          { properties: { place_id:'PLACE-0011', name:'Trichy', name_alt:'Tiruchirappalli', district:'Tiruchirappalli', state:'Tamil Nadu', state_code:'TN', place_type:'city', note:'Central Tamil Nadu; Cauvery delta foodways.' }, geometry:{ type:'Point', coordinates:[78.6974, 10.7850] } },
-          { properties: { place_id:'PLACE-0012', name:'Household Kitchen A', name_alt:'', district:'Thrissur', state:'Kerala', state_code:'KL', place_type:'household', note:'Location generalized for participant privacy.' }, geometry:{ type:'Point', coordinates:[76.3000, 10.6000] } }
-        ];
-      }
-
-      var colorMap = { Kerala: '#2A4732', 'Tamil Nadu': '#A33B24', household: '#5b646b' };
-      function markerColor(p) {
-        if (p.place_type === 'household') return colorMap.household;
-        return colorMap[p.state] || '#1A1F22';
-      }
-      function popupHTML(p) {
-        var h = '<div class="popup-name"><strong>' + (p.name || 'Unnamed place') + '</strong>';
-        if (p.name_alt) h += ' <span style="color:#5b646b;font-weight:400;">(' + p.name_alt + ')</span>';
-        h += '</div>';
-        h += '<div class="popup-record">' + (p.district || '') + ', ' + (p.state || '') + '</div>';
-        if (p.place_type === 'household') {
-          h += '<div class="popup-privacy">Location generalized for privacy</div>';
-        } else if (p.note) {
-          h += '<div class="popup-record">' + p.note + '</div>';
-        }
-        h += '<div class="popup-record"><a href="#record-' + p.place_id + '">View record</a> (pending)</div>';
-        return h;
-      }
-
-      features.forEach(function (f) {
-        var p = f.properties || {};
-        var coords = f.geometry && f.geometry.type === 'Point' ? f.geometry.coordinates : [77, 10];
-        var lat = coords[1], lon = coords[0];
-        if (!lat || !lon || isNaN(lat) || isNaN(lon)) return;
-        var marker = L.circleMarker([lat, lon], {
-          radius: p.place_type === 'household' ? 5 : 7,
-          fillColor: markerColor(p),
-          color: '#fff',
-          weight: 1.5,
-          opacity: 1,
-          fillOpacity: 0.85
-        });
-        marker.bindPopup(popupHTML(p), { maxWidth: 280 });
-        marker.placeId = p.place_id;
-        marker.properties = p;
-        markersByPlace[p.place_id] = { marker: marker, props: p };
-        markerLayer.addLayer(marker);
-      });
       map.addLayer(markerLayer);
+
+      var markersByPlace = {};
+      var placeIds = [];
 
       var listEl = document.getElementById('list');
       var countEl = document.getElementById('list-count');
       var searchInput = document.getElementById('search-list');
       var filterState = document.getElementById('filter-state');
       var filterType = document.getElementById('filter-type');
-      var placeIds = Object.keys(markersByPlace).sort();
 
+      // Function to parse GeoJSON and render to map
+      function processFeatures(features) {
+        var colorMap = { Kerala: '#2A4732', 'Tamil Nadu': '#A33B24', household: '#5b646b' };
+        
+        function markerColor(p) {
+          if (p.place_type === 'household') return colorMap.household;
+          return colorMap[p.state] || '#1A1F22';
+        }
+        
+        function popupHTML(p) {
+          var h = '<div class="popup-name"><strong>' + (p.name || 'Unnamed place') + '</strong>';
+          if (p.name_alt) h += ' <span style="color:#5b646b;font-weight:400;">(' + p.name_alt + ')</span>';
+          h += '</div>';
+          h += '<div class="popup-record">' + (p.district || '') + ', ' + (p.state || '') + '</div>';
+          if (p.place_type === 'household') {
+            h += '<div class="popup-privacy">Location generalized for privacy</div>';
+          } else if (p.note) {
+            h += '<div class="popup-record">' + p.note + '</div>';
+          }
+          h += '<div class="popup-record"><a href="#record-' + p.place_id + '">View record</a> (pending)</div>';
+          return h;
+        }
+
+        features.forEach(function (f) {
+          var p = f.properties || {};
+          var coords = f.geometry && f.geometry.type === 'Point' ? f.geometry.coordinates : [77, 10];
+          var lat = coords[1], lon = coords[0];
+          
+          if (!lat || !lon || isNaN(lat) || isNaN(lon)) return;
+          
+          var marker = L.circleMarker([lat, lon], {
+            radius: p.place_type === 'household' ? 5 : 7,
+            fillColor: markerColor(p),
+            color: '#fff',
+            weight: 1.5,
+            opacity: 1,
+            fillOpacity: 0.85
+          });
+          
+          marker.bindPopup(popupHTML(p), { maxWidth: 280 });
+          marker.placeId = p.place_id;
+          marker.properties = p;
+          
+          markersByPlace[p.place_id] = { marker: marker, props: p };
+          markerLayer.addLayer(marker);
+        });
+
+        placeIds = Object.keys(markersByPlace).sort();
+        renderList();
+      }
+
+      // Hardcoded Fallback Data just in case the fetch fails
+      var fallbackFeatures = [
+        { properties: { place_id:'PLACE-0001', name:'Palakkad', name_alt:'Palghat', district:'Palakkad', state:'Kerala', state_code:'KL', place_type:'town', note:'' }, geometry:{ type:'Point', coordinates:[76.6548, 10.7867] } },
+        { properties: { place_id:'PLACE-0002', name:'Thrissur', name_alt:'', district:'Thrissur', state:'Kerala', state_code:'KL', place_type:'town', note:'' }, geometry:{ type:'Point', coordinates:[76.2144, 10.5276] } },
+        { properties: { place_id:'PLACE-0003', name:'Kochi', name_alt:'Cochin', district:'Ernakulam', state:'Kerala', state_code:'KL', place_type:'port', note:'Historic Spice Route port city.' }, geometry:{ type:'Point', coordinates:[76.2678, 9.9351] } }
+      ];
+
+      // CORRECTED: Asynchronous Fetch Request
+      fetch('data/places.geojson')
+        .then(function(response) {
+          if (!response.ok) throw new Error('Network response was not ok');
+          return response.json();
+        })
+        .then(function(geo) {
+          processFeatures(geo.features);
+        })
+        .catch(function(error) {
+          console.warn('Could not load data/places.geojson, falling back to local data.', error);
+          processFeatures(fallbackFeatures);
+        });
+
+      // Function to render the sidebar list based on current filters
       function renderList() {
         var q = (searchInput ? searchInput.value : '').toLowerCase().trim();
         var state = filterState ? filterState.value : 'all';
         var type = filterType ? filterType.value : 'all';
         var visible = [];
+        
         placeIds.forEach(function (id) {
           var item = markersByPlace[id];
           var p = item.props;
@@ -754,29 +764,36 @@
           }
           visible.push(item);
         });
+        
         if (!listEl) return;
+        
         if (!visible.length) {
           listEl.innerHTML = '<div class="list-empty">No places match the current filters.</div>';
           if (countEl) countEl.textContent = '0 records';
           return;
         }
+        
         var frag = document.createDocumentFragment();
         visible.forEach(function (item) {
           var p = item.props;
           var div = document.createElement('div');
           div.className = 'list-item';
           div.setAttribute('data-place-id', p.place_id);
+          
           var name = document.createElement('div');
           name.className = 'name';
           name.innerHTML = p.name + (p.name_alt ? '<small>' + p.name_alt + '</small>' : '');
+          
           var meta = document.createElement('div');
           meta.className = 'meta';
           meta.innerHTML = '<div class="ptype">' + (p.place_type || '') + '</div>' + (p.district || '') + ', ' + (p.state || '');
+          
           div.appendChild(name);
           div.appendChild(meta);
           div.addEventListener('click', function () { focusPlace(p.place_id); });
           frag.appendChild(div);
         });
+        
         listEl.innerHTML = '';
         listEl.appendChild(frag);
         if (countEl) countEl.textContent = visible.length + ' record' + (visible.length === 1 ? '' : 's');
@@ -816,7 +833,6 @@
         }
       });
 
-      renderList();
       window.addEventListener('resize', function () { map.invalidateSize(); });
     })();
   </script>
