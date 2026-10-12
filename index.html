@@ -6,41 +6,31 @@
   <meta name="description" content="CULINDEX is an evolving digital archive and cultural map documenting the vernacular cuisines of Kerala and Tamil Nadu." />
   <meta name="theme-color" content="#F7F5F0" />
   <title>CULINDEX | The Culinary Heritage Index</title>
-
-  <!-- Professional Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
-
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
   <style>
-    /* Premium Editorial Theme Variables */
     :root {
-      --bg: #F7F5F0; 
+      --bg: #F7F5F0;
       --surface: #FFFFFF;
-      --text: #1A1F22; 
+      --text: #1A1F22;
       --muted: #646E73;
       --border: rgba(26, 31, 34, 0.12);
-      --spice: #A33B24; 
+      --spice: #A33B24;
       --spice-hover: #822C19;
-      --leaf: #2A4732; 
-      
+      --leaf: #2A4732;
       --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.03);
       --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.06);
       --radius: 4px;
-      
       --font-heading: "Lora", serif;
       --font-body: "Inter", sans-serif;
       --max-width: 1200px;
     }
-
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    
-    html { 
-      scroll-behavior: smooth; 
-      /* Fixes the bug where anchor links hide behind the sticky header */
-      scroll-padding-top: 5rem; 
-    }
-    
+    html { scroll-behavior: smooth; scroll-padding-top: 5rem; }
     body {
       font-family: var(--font-body);
       color: var(--text);
@@ -49,315 +39,113 @@
       -webkit-font-smoothing: antialiased;
       text-rendering: optimizeLegibility;
     }
-
     a { color: inherit; text-decoration: none; transition: color 0.3s ease, background 0.3s ease; }
+    a:hover { color: var(--spice); }
     img, svg { display: block; max-width: 100%; }
+    .container { width: min(100% - 3rem, var(--max-width)); margin-inline: auto; }
 
-    .container {
-      width: min(100% - 3rem, var(--max-width));
-      margin-inline: auto;
-    }
-
-    /* Navigation */
     .site-header {
-      position: sticky;
-      top: 0;
-      z-index: 1000;
+      position: sticky; top: 0; z-index: 1000;
       background: rgba(247, 245, 240, 0.95);
       backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       border-bottom: 1px solid var(--border);
     }
-
-    .nav {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1.25rem 0;
-      position: relative;
-    }
-
-    .brand {
-      font-family: var(--font-heading);
-      font-size: 1.5rem;
-      font-weight: 600;
-      letter-spacing: 0.05em;
-    }
-
+    .nav { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 0; position: relative; }
+    .brand { font-family: var(--font-heading); font-size: 1.5rem; font-weight: 600; letter-spacing: 0.05em; }
     .brand span { color: var(--spice); }
+    .nav-links { display: flex; gap: 2rem; align-items: center; }
+    .nav-links a { font-size: 0.9rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text); }
+    .mobile-menu-btn { display: none; background: none; border: none; cursor: pointer; color: var(--text); padding: 0.25rem; margin-left: 1rem; }
 
-    .nav-links { 
-      display: flex; 
-      gap: 2rem; 
-      align-items: center; 
-    }
-    
-    .nav-links a { 
-      font-size: 0.9rem; 
-      font-weight: 500; 
-      text-transform: uppercase; 
-      letter-spacing: 0.05em; 
-      color: var(--text); 
-    }
-    
-    .nav-links a:hover { color: var(--spice); }
-
-    /* Mobile Menu Button */
-    .mobile-menu-btn {
-      display: none;
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: var(--text);
-      padding: 0.25rem;
-    }
-
-    /* Hero Section */
-    .hero {
-      padding: 7rem 0 5rem;
-      border-bottom: 1px solid var(--border);
-      background: linear-gradient(to bottom, var(--surface) 0%, transparent 100%);
-    }
-
+    .hero { padding: 7rem 0 5rem; border-bottom: 1px solid var(--border); background: linear-gradient(to bottom, var(--surface) 0%, transparent 100%); }
     .hero-content { max-width: 800px; }
-
-    .eyebrow {
-      font-family: var(--font-body);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--leaf);
-      margin-bottom: 1.5rem;
-      display: block;
-    }
-
-    .hero h1 {
-      font-family: var(--font-heading);
-      font-size: clamp(2.5rem, 6vw, 4.5rem);
-      line-height: 1.1;
-      font-weight: 500;
-      margin-bottom: 1.5rem;
-      color: var(--text);
-    }
-
-    .hero .subtitle {
-      font-size: clamp(1.1rem, 3vw, 1.25rem);
-      color: var(--muted);
-      font-weight: 300;
-      margin-bottom: 2.5rem;
-      max-width: 600px;
-    }
-
-    /* Modern Buttons */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 1rem 2rem;
-      border-radius: var(--radius);
-      font-size: 0.9rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      font-weight: 500;
-      border: 1px solid transparent;
-      cursor: pointer;
-      transition: background 0.3s ease, transform 0.2s ease;
-    }
-
+    .eyebrow { font-size: 0.85rem; font-weight: 600; color: var(--leaf); margin-bottom: 1.5rem; display: block; text-transform: uppercase; letter-spacing: 0.1em; }
+    .hero h1 { font-family: var(--font-heading); font-size: clamp(2.5rem, 6vw, 4.5rem); line-height: 1.1; font-weight: 500; margin-bottom: 1.5rem; }
+    .hero .subtitle { font-size: clamp(1.1rem, 3vw, 1.25rem); color: var(--muted); font-weight: 300; margin-bottom: 2.5rem; max-width: 600px; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; padding: 1rem 2rem; border-radius: var(--radius); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500; border: 1px solid transparent; cursor: pointer; transition: background 0.3s ease, transform 0.2s ease; }
     .btn-primary { background: var(--spice); color: #fff; }
     .btn-primary:hover { background: var(--spice-hover); transform: translateY(-2px); }
 
-    /* Sections Shared */
     section { padding: 6rem 0; }
     .section-header { margin-bottom: 4rem; max-width: 700px; }
-    .section-header h2 {
-      font-family: var(--font-heading);
-      font-size: clamp(2rem, 4vw, 2.5rem);
-      font-weight: 500;
-      color: var(--leaf);
-      margin-bottom: 1rem;
-    }
-
-    /* Grids & Cards */
+    .section-header h2 { font-family: var(--font-heading); font-size: clamp(2rem, 4vw, 2.5rem); font-weight: 500; color: var(--leaf); margin-bottom: 1rem; }
     .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem; }
+    .card { background: var(--surface); border: 1px solid var(--border); padding: 3rem; border-radius: var(--radius); box-shadow: var(--shadow-sm); transition: box-shadow 0.3s ease, transform 0.3s ease; }
+    .card:hover { box-shadow: var(--shadow-lg); transform: translateY(-4px); }
+    .card h3 { font-family: var(--font-heading); font-size: 1.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.75rem; }
 
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      padding: 3rem;
-      border-radius: var(--radius);
-      box-shadow: var(--shadow-sm);
-      transition: box-shadow 0.3s ease, transform 0.3s ease;
-    }
-
-    .card:hover { 
-      box-shadow: var(--shadow-lg); 
-      transform: translateY(-4px); 
-    }
-    
-    .card h3 {
-      font-family: var(--font-heading);
-      font-size: 1.5rem;
-      margin-bottom: 1rem;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 0.75rem;
-    }
-
-    /* Team Section */
-    .team-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 2rem;
-    }
-
-    .team-card {
-      background: transparent;
-      border-left: 2px solid var(--spice);
-      padding: 1rem 0 1rem 1.5rem;
-    }
-
-    .team-card h3 {
-      font-family: var(--font-heading);
-      font-size: 1.4rem;
-      color: var(--text);
-      margin-bottom: 0.25rem;
-    }
-
-    .team-card .role {
-      font-size: 0.85rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--muted);
-      margin-bottom: 0.75rem;
-    }
-
-    .team-card .institution {
-      font-style: italic;
-      font-family: var(--font-heading);
-      color: var(--leaf);
-      margin-bottom: 1rem;
-    }
-    
-    .contact-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.9rem;
-      color: var(--spice);
-      font-weight: 500;
-    }
-
+    .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+    .team-card { background: transparent; border-left: 2px solid var(--spice); padding: 1rem 0 1rem 1.5rem; }
+    .team-card h3 { font-family: var(--font-heading); font-size: 1.4rem; margin-bottom: 0.25rem; border: none; padding: 0; }
+    .team-card .role { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 0.75rem; }
+    .team-card .institution { font-style: italic; font-family: var(--font-heading); color: var(--leaf); margin-bottom: 1rem; }
+    .contact-link { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: var(--spice); font-weight: 500; }
     .contact-link:hover { text-decoration: underline; color: var(--spice-hover); }
 
-    /* Map Section */
-    .map-container {
-      height: 500px;
-      background-color: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 2rem;
-      box-shadow: inset 0 0 40px rgba(0,0,0,0.02);
-    }
+    .map-controls { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; align-items: center; }
+    .map-controls label { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-right: 0.25rem; }
+    .filter-select, .search-input { font: inherit; padding: 0.5rem 0.75rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); color: var(--text); font-size: 0.9rem; }
+    .filter-select:focus, .search-input:focus { outline: 2px solid var(--spice); outline-offset: 1px; }
+    .map-wrap { position: relative; width: 100%; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-sm); }
+    .map-legend { position: absolute; bottom: 1rem; right: 1rem; z-index: 1000; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.75rem 1rem; font-size: 0.8rem; color: var(--muted); box-shadow: var(--shadow-sm); line-height: 1.5; }
+    .map-legend strong { color: var(--text); }
+    .leaflet-popup-content-wrapper { border-radius: 4px; }
+    .leaflet-popup-content { margin: 12px 14px; font-family: var(--font-body); }
+    .popup-record { font-size: 0.9rem; color: var(--muted); margin-top: 4px; }
+    .popup-record a { color: var(--spice); font-weight: 500; }
+    .popup-record a:hover { text-decoration: underline; }
 
-    .map-container svg { margin-bottom: 1rem; stroke: var(--muted); }
+    .list-panel { margin-top: 2rem; }
+    .list-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem; }
+    .list-head h3 { font-family: var(--font-heading); font-size: 1.2rem; color: var(--leaf); }
+    .list-head .count { color: var(--muted); font-size: 0.9rem; }
+    .list-scroll { max-height: 420px; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+    .list-item { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; padding: 0.85rem 1rem; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.15s ease; }
+    .list-item:last-child { border-bottom: 0; }
+    .list-item:hover { background: rgba(163, 59, 36, 0.04); }
+    .list-item.active { background: rgba(42, 71, 50, 0.06); }
+    .list-item .name { font-weight: 500; }
+    .list-item .name small { color: var(--muted); font-weight: 400; display: block; font-size: 0.8rem; margin-top: 2px; }
+    .list-item .meta { text-align: right; color: var(--muted); font-size: 0.8rem; white-space: nowrap; }
+    .list-item .meta .ptype { text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.7rem; color: var(--leaf); margin-bottom: 2px; }
+    .list-empty { padding: 2rem; text-align: center; color: var(--muted); font-size: 0.9rem; }
 
-    /* Footer */
-    footer {
-      background: var(--text);
-      color: #fff;
-      padding: 5rem 0 3rem;
-      margin-top: 4rem;
-    }
-
-    .footer-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 4rem;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-      padding-bottom: 4rem;
-      margin-bottom: 2rem;
-    }
-
-    .footer-brand h3 {
-      font-family: var(--font-heading);
-      font-size: 1.75rem;
-      margin-bottom: 1rem;
-    }
-    
+    footer { background: var(--text); color: #fff; padding: 5rem 0 3rem; margin-top: 4rem; }
+    .footer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 4rem; margin-bottom: 2rem; }
+    .footer-brand h3 { font-family: var(--font-heading); font-size: 1.75rem; margin-bottom: 1rem; }
     .footer-brand p { color: rgba(255,255,255,0.7); max-width: 400px; }
-
-    .footer-contact h4 {
-      font-family: var(--font-body);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      font-size: 0.9rem;
-      margin-bottom: 1.5rem;
-      color: rgba(255,255,255,0.5);
-    }
-
-    .footer-contact a {
-      display: block;
-      color: #fff;
-      margin-bottom: 0.75rem;
-      font-size: 1.1rem;
-    }
-
+    .footer-contact h4 { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1.5rem; color: rgba(255,255,255,0.5); }
+    .footer-contact a { display: block; color: #fff; margin-bottom: 0.75rem; font-size: 1.1rem; }
     .footer-contact a:hover { color: var(--spice); }
+    .footer-bottom { display: flex; justify-content: space-between; color: rgba(255,255,255,0.5); font-size: 0.85rem; flex-wrap: wrap; gap: 0.5rem; }
+    .footer-bottom a { color: rgba(255,255,255,0.7); }
+    .footer-bottom a:hover { color: #fff; }
 
-    .footer-bottom {
-      display: flex;
-      justify-content: space-between;
-      color: rgba(255,255,255,0.5);
-      font-size: 0.85rem;
-    }
-
-    /* Mobile Responsiveness */
     @media (max-width: 768px) {
       .grid-2, .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
-      
       .mobile-menu-btn { display: block; }
-      
-      /* Mobile Dropdown Menu Styling */
-      .nav-links { 
-        display: none; 
-        flex-direction: column; 
-        position: absolute;
-        top: 100%;
-        left: 0;
-        width: 100%;
-        background: rgba(247, 245, 240, 0.98);
-        padding: 1.5rem 0;
-        border-bottom: 1px solid var(--border);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.05);
-      }
-      
+      .nav-links { display: none; flex-direction: column; position: absolute; top: 100%; left: 0; width: 100%; background: rgba(247, 245, 240, 0.98); padding: 1.5rem 0; border-bottom: 1px solid var(--border); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
       .nav-links.active { display: flex; }
-
       .hero { padding: 4rem 0; }
       .card { padding: 2rem; }
       .footer-bottom { flex-direction: column; gap: 1rem; text-align: center; }
+      .map-legend { bottom: 0.5rem; right: 0.5rem; font-size: 0.75rem; padding: 0.5rem 0.75rem; }
+      .list-scroll { max-height: 300px; }
     }
   </style>
 </head>
 <body>
-
   <header class="site-header">
     <div class="container nav">
-      <a href="#" class="brand">CUL<span>INDEX</span></a>
-      
+      <a href="#about" class="brand">CUL<span>INDEX</span></a>
       <button class="mobile-menu-btn" aria-label="Toggle navigation" aria-expanded="false">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <line x1="3" y1="12" x2="21" y2="12"></line>
           <line x1="3" y1="6" x2="21" y2="6"></line>
           <line x1="3" y1="18" x2="21" y2="18"></line>
         </svg>
       </button>
-
       <nav class="nav-links">
         <a href="#about">Project</a>
         <a href="#regions">Regions</a>
@@ -368,7 +156,6 @@
   </header>
 
   <main>
-    <!-- Hero -->
     <section class="hero">
       <div class="container hero-content">
         <span class="eyebrow">Digital Archive in Progress</span>
@@ -378,7 +165,6 @@
       </div>
     </section>
 
-    <!-- About -->
     <section id="about">
       <div class="container">
         <div class="section-header">
@@ -402,7 +188,6 @@
       </div>
     </section>
 
-    <!-- Regions -->
     <section id="regions" style="background-color: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
       <div class="container">
         <div class="section-header">
@@ -422,33 +207,53 @@
       </div>
     </section>
 
-    <!-- Map Placeholder -->
     <section id="map">
       <div class="container">
         <div class="section-header">
           <h2>Interactive Cultural Map</h2>
-          <p>Our upcoming location-based module will allow researchers and enthusiasts to explore recipes, ingredients, and culinary histories by exact geographic coordinates.</p>
+          <p>Approved places in the archive, mapped. Records with private or sensitive locations are omitted or generalized; the level of precision is noted on each marker.</p>
         </div>
-        <div class="map-container">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon>
-            <line x1="9" y1="3" x2="9" y2="18"></line>
-            <line x1="15" y1="6" x2="15" y2="21"></line>
-          </svg>
-          <h3 style="font-family: var(--font-heading); margin-bottom: 0.5rem;">Map Module in Development</h3>
-          <p style="color: var(--muted); max-width: 400px;">This space is reserved for the future deployment of our custom GIS layer, featuring interactive region markers and data filters.</p>
+        <div class="map-controls">
+          <label for="filter-state">State</label>
+          <select id="filter-state" class="filter-select">
+            <option value="all">All</option>
+            <option value="Kerala">Kerala</option>
+            <option value="Tamil Nadu">Tamil Nadu</option>
+          </select>
+          <label for="filter-type">Type</label>
+          <select id="filter-type" class="filter-select">
+            <option value="all">All</option>
+            <option value="city">City</option>
+            <option value="town">Town</option>
+            <option value="port">Port</option>
+            <option value="region">Region</option>
+            <option value="household">Household</option>
+          </select>
+          <label for="search-list" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);">Search places</label>
+          <input type="search" id="search-list" class="search-input" placeholder="Search places…" style="margin-left:auto;" />
+        </div>
+        <div class="map-wrap" id="map"></div>
+        <div class="map-legend">
+          <strong>● Place marker</strong><br/>
+          Clusters group nearby points.<br/>
+          Generalized locations are flagged in popups.
+        </div>
+        <div class="list-panel">
+          <div class="list-head">
+            <h3>Places in the Archive</h3>
+            <span class="count" id="list-count">12 records</span>
+          </div>
+          <div class="list-scroll" id="list"></div>
         </div>
       </div>
     </section>
 
-    <!-- Team & Investigators -->
     <section id="team" style="background-color: var(--surface); border-top: 1px solid var(--border);">
       <div class="container">
         <div class="section-header" style="margin-bottom: 3rem;">
           <h2>Principal Investigators</h2>
         </div>
         <div class="team-grid">
-          
           <div class="team-card">
             <div class="role">Principal Investigator</div>
             <h3>Dr. Gigy J. Alex</h3>
@@ -458,7 +263,6 @@
               gigyjalex@gmail.com
             </a>
           </div>
-
           <div class="team-card">
             <div class="role">Principal Investigator</div>
             <h3>Dr. Anu Kuriakose</h3>
@@ -468,14 +272,11 @@
               anuk@nitt.edu
             </a>
           </div>
-
         </div>
       </div>
     </section>
-
   </main>
 
-  <!-- Footer -->
   <footer id="contact">
     <div class="container">
       <div class="footer-grid">
@@ -484,38 +285,208 @@
           <p>A digital preservation and mapping project dedicated to the vernacular culinary heritage of Kerala and Tamil Nadu.</p>
         </div>
         <div class="footer-contact">
-          <h4>Project Inquiries & Contributions</h4>
+          <h4>Project Inquiries &amp; Contributions</h4>
           <a href="mailto:southindianculindex@gmail.com">southindianculindex@gmail.com</a>
         </div>
       </div>
       <div class="footer-bottom">
         <p>&copy; 2026 CULINDEX. All rights reserved.</p>
         <p>Hosted via GitHub Pages</p>
-        <p>Developed and Managed by <a href="https://jorlin.in/">jorlin.in</p>
+        <p>Developed and Managed by <a href="https://jorlin.in/">jorlin.in</a></p>
       </div>
     </div>
   </footer>
 
-  <!-- Script for Mobile Menu -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/zwW9t55a0iY+ROS6g=" crossorigin=""></script>
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+
   <script>
-    const menuBtn = document.querySelector('.mobile-menu-btn');
-    const navLinks = document.querySelector('.nav-links');
-    
-    // Toggle menu open/close
-    menuBtn.addEventListener('click', () => {
-      navLinks.classList.toggle('active');
-      const isExpanded = menuBtn.getAttribute('aria-expanded') === 'true';
-      menuBtn.setAttribute('aria-expanded', !isExpanded);
-    });
+    (function () {
+      'use strict';
 
-    // Close menu when a link is clicked
-    document.querySelectorAll('.nav-links a').forEach(link => {
-      link.addEventListener('click', () => {
-        navLinks.classList.remove('active');
-        menuBtn.setAttribute('aria-expanded', 'false');
+      var menuBtn = document.querySelector('.mobile-menu-btn');
+      var navLinks = document.querySelector('.nav-links');
+      if (menuBtn && navLinks) {
+        menuBtn.addEventListener('click', function () {
+          var open = navLinks.classList.toggle('active');
+          menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
+        navLinks.querySelectorAll('a').forEach(function (link) {
+          link.addEventListener('click', function () {
+            navLinks.classList.remove('active');
+            menuBtn.setAttribute('aria-expanded', 'false');
+          });
+        });
+      }
+
+      var mapEl = document.getElementById('map');
+      if (!mapEl) return;
+
+      var map = L.map('map', { center: [10.5, 77.0], zoom: 7, zoomControl: true, attributionControl: true });
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
+
+      var markerLayer = L.markerClusterGroup({
+        showCoverageOnHover: false,
+        spiderfyOnMaxZoom: true,
+        disableClusteringAtZoom: 13
       });
-    });
-  </script>
 
+      var features = [];
+      var markersByPlace = {};
+
+      try {
+        var resp = fetch('data/places.geojson');
+        var geo = resp.ok ? resp.json() : null;
+        if (!geo) throw new Error('GeoJSON unavailable');
+        features = geo.features;
+      } catch (e) {
+        features = [
+          { properties: { place_id:'PLACE-0001', name:'Palakkad', name_alt:'Palghat', district:'Palakkad', state:'Kerala', state_code:'KL', place_type:'town', note:'' }, geometry:{ type:'Point', coordinates:[76.6548, 10.7867] } },
+          { properties: { place_id:'PLACE-0002', name:'Thrissur', name_alt:'', district:'Thrissur', state:'Kerala', state_code:'KL', place_type:'town', note:'' }, geometry:{ type:'Point', coordinates:[76.2144, 10.5276] } },
+          { properties: { place_id:'PLACE-0003', name:'Kochi', name_alt:'Cochin', district:'Ernakulam', state:'Kerala', state_code:'KL', place_type:'port', note:'Historic Spice Route port city.' }, geometry:{ type:'Point', coordinates:[76.2678, 9.9351] } },
+          { properties: { place_id:'PLACE-0004', name:'Kozhikode', name_alt:'Calicut', district:'Kozhikode', state:'Kerala', state_code:'KL', place_type:'port', note:'Mappila cuisine heartland on the Malabar coast.' }, geometry:{ type:'Point', coordinates:[75.7804, 11.2598] } },
+          { properties: { place_id:'PLACE-0005', name:'Thiruvananthapuram', name_alt:'Trivandrum', district:'Thiruvananthapuram', state:'Kerala', state_code:'KL', place_type:'city', note:'Southern tip of the Kerala coastal belt.' }, geometry:{ type:'Point', coordinates:[76.9319, 8.4855] } },
+          { properties: { place_id:'PLACE-0006', name:'Kasaragod', name_alt:'', district:'Kasaragod', state:'Kerala', state_code:'KL', place_type:'town', note:'Northernmost Kerala district; historic spice trade.' }, geometry:{ type:'Point', coordinates:[74.9853, 12.5089] } },
+          { properties: { place_id:'PLACE-0007', name:'Chettinad', name_alt:'Chetti Nadu', district:'Sivaganga', state:'Tamil Nadu', state_code:'TN', place_type:'region', note:'Famous for rich, spice-heavy Chettinad cuisine.' }, geometry:{ type:'Point', coordinates:[78.4039, 9.7264] } },
+          { properties: { place_id:'PLACE-0008', name:'Madurai', name_alt:'', district:'Madurai', state:'Tamil Nadu', state_code:'TN', place_type:'city', note:'Meenakshi temple city; distinct Pandya-region foodways.' }, geometry:{ type:'Point', coordinates:[78.1183, 9.9197] } },
+          { properties: { place_id:'PLACE-0009', name:'Kongunadu', name_alt:'Kongu Nadu', district:'Coimbatore', state:'Tamil Nadu', state_code:'TN', place_type:'region', note:'Western Tamil Nadu; distinct Kongu culinary tradition.' }, geometry:{ type:'Point', coordinates:[77.3439, 10.9815] } },
+          { properties: { place_id:'PLACE-0010', name:'Nanjilnadu', name_alt:'Nanjil Nadu', district:'Kanyakumari', state:'Tamil Nadu', state_code:'TN', place_type:'region', note:'Southernmost Tamil Nadu; unique regional preparations.' }, geometry:{ type:'Point', coordinates:[77.5139, 8.0175] } },
+          { properties: { place_id:'PLACE-0011', name:'Trichy', name_alt:'Tiruchirappalli', district:'Tiruchirappalli', state:'Tamil Nadu', state_code:'TN', place_type:'city', note:'Central Tamil Nadu; Cauvery delta foodways.' }, geometry:{ type:'Point', coordinates:[78.6974, 10.7850] } },
+          { properties: { place_id:'PLACE-0012', name:'Household Kitchen A', name_alt:'', district:'Thrissur', state:'Kerala', state_code:'KL', place_type:'household', note:'Location generalized for participant privacy.' }, geometry:{ type:'Point', coordinates:[76.3000, 10.6000] } }
+        ];
+      }
+
+      var colorMap = { Kerala: '#2A4732', 'Tamil Nadu': '#A33B24', household: '#646E73' };
+      function markerColor(p) {
+        if (p.place_type === 'household') return colorMap.household;
+        return colorMap[p.state] || '#1A1F22';
+      }
+      function popupHTML(p) {
+        var h = '<div class="popup-name"><strong>' + (p.name || 'Unnamed place') + '</strong>';
+        if (p.name_alt) h += ' <span style="color:#646E73;font-weight:400;">(' + p.name_alt + ')</span>';
+        h += '</div>';
+        h += '<div class="popup-record">' + (p.district || '') + ', ' + (p.state || '') + '</div>';
+        if (p.place_type === 'household') {
+          h += '<div class="popup-record" style="color:#A33B24;">Location generalized for privacy</div>';
+        } else if (p.note) {
+          h += '<div class="popup-record">' + p.note + '</div>';
+        }
+        h += '<div class="popup-record"><a href="#record-' + p.place_id + '">View record</a> (pending)</div>';
+        return h;
+      }
+
+      features.forEach(function (f) {
+        var p = f.properties || {};
+        var coords = f.geometry && f.geometry.type === 'Point' ? f.geometry.coordinates : [77, 10];
+        var lat = coords[1], lon = coords[0];
+        if (!lat || !lon || isNaN(lat) || isNaN(lon)) return;
+        var marker = L.circleMarker([lat, lon], {
+          radius: p.place_type === 'household' ? 5 : 7,
+          fillColor: markerColor(p),
+          color: '#fff',
+          weight: 1.5,
+          opacity: 1,
+          fillOpacity: 0.85
+        });
+        marker.bindPopup(popupHTML(p), { maxWidth: 280 });
+        marker.placeId = p.place_id;
+        marker.properties = p;
+        markersByPlace[p.place_id] = { marker: marker, props: p };
+        markerLayer.addLayer(marker);
+      });
+      map.addLayer(markerLayer);
+
+      var listEl = document.getElementById('list');
+      var countEl = document.getElementById('list-count');
+      var searchInput = document.getElementById('search-list');
+      var filterState = document.getElementById('filter-state');
+      var filterType = document.getElementById('filter-type');
+      var placeIds = Object.keys(markersByPlace).sort();
+
+      function renderList() {
+        var q = (searchInput ? searchInput.value : '').toLowerCase().trim();
+        var state = filterState ? filterState.value : 'all';
+        var type = filterType ? filterType.value : 'all';
+        var visible = [];
+        placeIds.forEach(function (id) {
+          var item = markersByPlace[id];
+          var p = item.props;
+          if (state !== 'all' && p.state !== state) return;
+          if (type !== 'all' && p.place_type !== type) return;
+          if (q) {
+            var hay = (p.name + ' ' + (p.name_alt||'') + ' ' + (p.district||'') + ' ' + (p.state||'') + ' ' + (p.place_type||'')).toLowerCase();
+            if (hay.indexOf(q) === -1) return;
+          }
+          visible.push(item);
+        });
+        if (!listEl) return;
+        if (!visible.length) {
+          listEl.innerHTML = '<div class="list-empty">No places match the current filters.</div>';
+          if (countEl) countEl.textContent = '0 records';
+          return;
+        }
+        var frag = document.createDocumentFragment();
+        visible.forEach(function (item) {
+          var p = item.props;
+          var div = document.createElement('div');
+          div.className = 'list-item';
+          div.setAttribute('data-place-id', p.place_id);
+          var name = document.createElement('div');
+          name.className = 'name';
+          name.innerHTML = p.name + (p.name_alt ? '<small>' + p.name_alt + '</small>' : '');
+          var meta = document.createElement('div');
+          meta.className = 'meta';
+          meta.innerHTML = '<div class="ptype">' + (p.place_type || '') + '</div>' + (p.district || '') + ', ' + (p.state || '');
+          div.appendChild(name);
+          div.appendChild(meta);
+          div.addEventListener('click', function () { focusPlace(p.place_id); });
+          frag.appendChild(div);
+        });
+        listEl.innerHTML = '';
+        listEl.appendChild(frag);
+        if (countEl) countEl.textContent = visible.length + ' record' + (visible.length === 1 ? '' : 's');
+      }
+
+      function focusPlace(id) {
+        var item = markersByPlace[id];
+        if (!item) return;
+        var m = item.marker;
+        map.setView(m.getLatLng(), Math.max(map.getZoom(), 11), { animate: true });
+        m.openPopup();
+        if (listEl) {
+          var els = listEl.querySelectorAll('.list-item');
+          for (var i = 0; i < els.length; i++) {
+            els[i].classList.toggle('active', els[i].getAttribute('data-place-id') === id);
+          }
+        }
+      }
+
+      if (searchInput) searchInput.addEventListener('input', renderList);
+      if (filterState) filterState.addEventListener('change', renderList);
+      if (filterType) filterType.addEventListener('change', renderList);
+
+      map.on('moveend', function () {
+        var bounds = map.getBounds();
+        var best = null, bestDist = Infinity;
+        placeIds.forEach(function (id) {
+          var item = markersByPlace[id];
+          if (!bounds.contains(item.marker.getLatLng())) return;
+          var d = map.getCenter().distanceTo(item.marker.getLatLng());
+          if (d < bestDist) { bestDist = d; best = id; }
+        });
+        if (best && listEl) {
+          listEl.querySelectorAll('.list-item').forEach(function (el) {
+            el.classList.toggle('active', el.getAttribute('data-place-id') === best);
+          });
+        }
+      });
+
+      renderList();
+      window.addEventListener('resize', function () { map.invalidateSize(); });
+    })();
+  </script>
 </body>
 </html>
